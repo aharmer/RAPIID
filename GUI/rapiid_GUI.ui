@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2323</width>
-    <height>1141</height>
+    <width>2317</width>
+    <height>1128</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,8 +25,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>2303</width>
-         <height>1121</height>
+         <width>2297</width>
+         <height>1108</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -302,7 +302,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QLabel" name="label_5">
+              <widget class="QLabel" name="camera_3_label">
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -325,14 +325,14 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_26">
+                  <widget class="QLabel" name="camera_3_exposure_label">
                    <property name="text">
                     <string>Exposure time (us)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_13"/>
+                  <widget class="QSpinBox" name="spinBox_camera_3_exposure"/>
                  </item>
                 </layout>
                </item>
@@ -342,28 +342,28 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_27">
+                  <widget class="QLabel" name="camera_3_gain_label">
                    <property name="text">
                     <string>Gain level (dB)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_14"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_3_gain"/>
                  </item>
                 </layout>
                </item>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_21">
                  <item>
-                  <widget class="QLabel" name="label_28">
+                  <widget class="QLabel" name="camera_3_gamma_label">
                    <property name="text">
                     <string>Gamma correction</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_15"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_3_gamma"/>
                  </item>
                 </layout>
                </item>
@@ -818,6 +818,13 @@
                <number>5</number>
               </property>
               <item>
+               <widget class="QPushButton" name="pushButton_load_config">
+                <property name="text">
+                 <string>Load config file...</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="pushButton_outputFolder">
                 <property name="text">
                  <string>Output folder...</string>
@@ -894,6 +901,54 @@
                 </property>
                 <property name="text">
                  <string>Capture image set</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>15</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Log</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QListWidget" name="listWidget_log">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>1000</width>
+                  <height>400</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="isWrapping" stdset="0">
+                 <bool>true</bool>
+                </property>
+                <property name="wordWrap">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

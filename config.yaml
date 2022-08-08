@@ -1,0 +1,22 @@
+general:
+  camera_type: FLIR
+  camera_model: BFS-U3-200S6C-C
+camera_settings:
+  exposure_time: 90000.0
+  gain_level: 1.83
+  gamma: 0.8
+  shutterspeed: ''
+  aperture: ''
+  iso: ''
+  whitebalance: ''
+  compression: ''
+exif_data:
+  Make: FLIR
+  Model: BFS-U3-200S6C-C
+  SerialNumber: '20531153'
+  Lens: MPZ
+  CameraSerialNumber: '20531153'
+  LensManufacturer: Computar
+  LensModel: 35.0 f / 2.2
+  FocalLength: '35.0'
+  FocalLengthIn35mmFormat: '95.0'
