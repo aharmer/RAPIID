@@ -1,4 +1,5 @@
 import sys
+import os
 from pathlib import Path
 import datetime
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -107,6 +108,8 @@ class UI(QMainWindow):
         self.ui.spinBox_camera_3_exposure.valueChanged.connect(self.set_exposure_manual)
         self.ui.doubleSpinBox_camera_3_gain.valueChanged.connect(self.set_gain_manual)
         self.ui.doubleSpinBox_camera_3_gamma.valueChanged.connect(self.set_gamma)
+
+        self.ui.pushButton_capture.pressed.connect(self.capture_image)
 
         # Find FLIR cameras, if attached
         try:
@@ -224,6 +227,20 @@ class UI(QMainWindow):
         if value is not None:
             self.log_info("Gain set to " + str(value))
             self.cam.set_gamma(float(value))
+
+    def capture_image(self):
+        now = datetime.datetime.now()
+        self.create_output_folders()
+        # create unique filename
+        file_name = str(self.output_location_folder.joinpath(self.ui.lineEdit.text() + "_label1" + self.file_format))
+        self.cam.capture_image(file_name)
+        self.log_info("Captured " + file_name)
+
+    def create_output_folders(self):
+        self.output_location_folder = Path(self.output_location).joinpath(self.ui.lineEdit.text())
+        if not os.path.exists(self.output_location_folder):
+            os.makedirs(self.output_location_folder)
+            self.log_info("Created folder at: " + str(self.output_location_folder))
 
     def loadConfig(self):
         file = QtWidgets.QFileDialog.getOpenFileName(self, "Load existing config file", str(Path.cwd()), "config file (*.yaml)")

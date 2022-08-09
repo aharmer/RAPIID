@@ -925,7 +925,7 @@
                <widget class="QLineEdit" name="lineEdit"/>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="pushButton_capture">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
