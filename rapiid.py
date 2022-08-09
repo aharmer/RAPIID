@@ -97,7 +97,7 @@ class UI(QMainWindow):
 
         # search for cameras connected to the computer and supported by installed drivers
         self.liveView = False
-        self.camera_type = "FLIR"
+        self.camera_type = None
         self.camera_model = None
         self.file_format = ".tif"
         # self.DSLR_read_out = False
@@ -105,10 +105,12 @@ class UI(QMainWindow):
 
         self.ui.pushButton_camera_3.pressed.connect(self.begin_live_view)
         self.ui.spinBox_camera_3_exposure.valueChanged.connect(self.set_exposure_manual)
+        self.ui.doubleSpinBox_camera_3_gain.valueChanged.connect(self.set_gain_manual)
+        self.ui.doubleSpinBox_camera_3_gamma.valueChanged.connect(self.set_gamma)
 
         # Find FLIR cameras, if attached
         try:
-            from rapiid_FLIR import customFLIR
+            from scripts.rapiid_FLIR import customFLIR
             self.FLIR = customFLIR()
             # camera needs to be initialised before use (self.cam.initialise_camera)
             # all detected FLIR cameras are listed in self.cam.device_names
@@ -136,9 +138,6 @@ class UI(QMainWindow):
             self.FLIR_found = False
             self.disable_FLIR_inputs()
 
-        # FLIR settings
-        # self.ui.doubleSpinBox_exposureTime.valueChanged.connect(self.set_exposure_manual)
-
         # Select output folder
         self.output_location = str(Path.cwd())
         self.update_output_location()
@@ -163,9 +162,6 @@ class UI(QMainWindow):
 
     def update_output_location(self):
         self.ui.display_path.setText(self.output_location)
-
-    # def imageUpdateSlot(self, image):
-    #     self.ui.camera_3.setPixmap(QPixmap.fromImage(image))
 
     def log_info(self, info):
         now = datetime.datetime.now()
@@ -208,12 +204,26 @@ class UI(QMainWindow):
             self.liveView = False
 
     def set_exposure_manual(self):
-        # self.ui.label_exposureTime.setEnabled(True)
+        self.ui.camera_3_exposure_label.setEnabled(True)
         self.ui.spinBox_camera_3_exposure.setEnabled(True)
         value = self.ui.spinBox_camera_3_exposure.value()
         if value is not None:
             self.log_info("Exposure time set to " + str(value) + " [us]")
             self.cam.configure_exposure(float(value))
+
+    def set_gain_manual(self):
+        self.ui.camera_3_gain_label.setEnabled(True)
+        self.ui.doubleSpinBox_camera_3_gain.setEnabled(True)
+        value = self.ui.doubleSpinBox_camera_3_gain.value()
+        if value is not None:
+            self.log_info("Gain level set to " + str(value) + " [dB]")
+            self.cam.set_gain(float(value))
+
+    def set_gamma(self):
+        value = self.ui.doubleSpinBox_camera_3_gamma.value()
+        if value is not None:
+            self.log_info("Gain set to " + str(value))
+            self.cam.set_gamma(float(value))
 
     def loadConfig(self):
         file = QtWidgets.QFileDialog.getOpenFileName(self, "Load existing config file", str(Path.cwd()), "config file (*.yaml)")
@@ -234,9 +244,9 @@ class UI(QMainWindow):
 
             if config["general"]["camera_type"] == "FLIR":
                 # FLIR
-                self.ui.doubleSpinBox_exposureTime.setValue(config["camera_settings"]["exposure_time"])
-                self.ui.doubleSpinBox_gainLevel.setValue(config["camera_settings"]["gain_level"])
-                self.ui.doubleSpinBox_gamma.setValue(config["camera_settings"]["gamma"])
+                self.ui.spinBox_camera_3_exposure.setValue(config["camera_settings"]["exposure_time"])
+                self.ui.doubleSpinBox_camera_3_gain.setValue(config["camera_settings"]["gain_level"])
+                self.ui.doubleSpinBox_camera_3_gamma.setValue(config["camera_settings"]["gamma"])
                 self.set_gamma()
 
             # else:

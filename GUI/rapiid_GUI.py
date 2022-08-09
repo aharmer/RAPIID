@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'C:\Users\HarmerA\repos\rapiid\rapiid_GUI.ui'
+# Form implementation generated from reading ui file 'C:\Users\HarmerA\repos\rapiid\GUI\rapiid_GUI.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.7
 #
@@ -181,6 +181,10 @@ class Ui_MainWindow(object):
         self.camera_3_exposure_label.setObjectName("camera_3_exposure_label")
         self.verticalLayout_19.addWidget(self.camera_3_exposure_label)
         self.spinBox_camera_3_exposure = QtWidgets.QSpinBox(self.horizontalWidget)
+        self.spinBox_camera_3_exposure.setMinimum(1000)
+        self.spinBox_camera_3_exposure.setMaximum(1000000)
+        self.spinBox_camera_3_exposure.setSingleStep(1000)
+        self.spinBox_camera_3_exposure.setProperty("value", 90000)
         self.spinBox_camera_3_exposure.setObjectName("spinBox_camera_3_exposure")
         self.verticalLayout_19.addWidget(self.spinBox_camera_3_exposure)
         self.horizontalLayout_6.addLayout(self.verticalLayout_19)
@@ -191,6 +195,8 @@ class Ui_MainWindow(object):
         self.camera_3_gain_label.setObjectName("camera_3_gain_label")
         self.verticalLayout_20.addWidget(self.camera_3_gain_label)
         self.doubleSpinBox_camera_3_gain = QtWidgets.QDoubleSpinBox(self.horizontalWidget)
+        self.doubleSpinBox_camera_3_gain.setMaximum(25.0)
+        self.doubleSpinBox_camera_3_gain.setProperty("value", 1.83)
         self.doubleSpinBox_camera_3_gain.setObjectName("doubleSpinBox_camera_3_gain")
         self.verticalLayout_20.addWidget(self.doubleSpinBox_camera_3_gain)
         self.horizontalLayout_6.addLayout(self.verticalLayout_20)
@@ -200,6 +206,10 @@ class Ui_MainWindow(object):
         self.camera_3_gamma_label.setObjectName("camera_3_gamma_label")
         self.verticalLayout_21.addWidget(self.camera_3_gamma_label)
         self.doubleSpinBox_camera_3_gamma = QtWidgets.QDoubleSpinBox(self.horizontalWidget)
+        self.doubleSpinBox_camera_3_gamma.setMinimum(0.1)
+        self.doubleSpinBox_camera_3_gamma.setMaximum(4.0)
+        self.doubleSpinBox_camera_3_gamma.setSingleStep(0.1)
+        self.doubleSpinBox_camera_3_gamma.setProperty("value", 0.8)
         self.doubleSpinBox_camera_3_gamma.setObjectName("doubleSpinBox_camera_3_gamma")
         self.verticalLayout_21.addWidget(self.doubleSpinBox_camera_3_gamma)
         self.horizontalLayout_6.addLayout(self.verticalLayout_21)

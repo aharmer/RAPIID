@@ -127,7 +127,7 @@ class customFLIR():
             # 200751  # with grey backdrop and half illumination
             exposure_time_to_set = min(self.cam.ExposureTime.GetMax(), exposure_time_to_set)
             self.cam.ExposureTime.SetValue(exposure_time_to_set)
-            print('Shutter time set to %s us...\n' % exposure_time_to_set)
+            print('Exposure time set to %s us...\n' % exposure_time_to_set)
 
 
         except PySpin.SpinnakerException as ex:
@@ -289,8 +289,8 @@ class customFLIR():
                     width = int(width * scale_percent / 100)
                     height = int(height * scale_percent / 100)
                     dim = (width, height)
+                    
                     # resize image
-
                     resized = cv2.resize(img_conv.GetNDArray(), dim, interpolation=cv2.INTER_AREA)
 
                     # Release image
