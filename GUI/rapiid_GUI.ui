@@ -48,7 +48,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QLabel" name="label">
+              <widget class="QLabel" name="camera_1_label">
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -71,16 +71,19 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_14">
+                  <widget class="QLabel" name="camera_1_aperture_label">
                    <property name="text">
                     <string>Aperture</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_aperture">
                    <property name="buttonSymbols">
                     <enum>QAbstractSpinBox::UpDownArrows</enum>
+                   </property>
+                   <property name="value">
+                    <double>0.000000000000000</double>
                    </property>
                   </widget>
                  </item>
@@ -92,28 +95,28 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_15">
+                  <widget class="QLabel" name="camera_1_shutterspeed_label">
                    <property name="text">
                     <string>Shutterspeed</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_2"/>
+                  <widget class="QSpinBox" name="spinBox_camera_1_shutterspeed"/>
                  </item>
                 </layout>
                </item>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <widget class="QLabel" name="label_16">
+                  <widget class="QLabel" name="camera_1_ISO_label">
                    <property name="text">
                     <string>ISO</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_3"/>
+                  <widget class="QSpinBox" name="spinBox_camera_1_ISO"/>
                  </item>
                 </layout>
                </item>
@@ -977,8 +980,11 @@
                 <property name="layoutDirection">
                  <enum>Qt::LeftToRight</enum>
                 </property>
+                <property name="horizontalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAlwaysOff</enum>
+                </property>
                 <property name="isWrapping" stdset="0">
-                 <bool>true</bool>
+                 <bool>false</bool>
                 </property>
                 <property name="wordWrap">
                  <bool>true</bool>

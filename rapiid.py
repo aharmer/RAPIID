@@ -96,13 +96,13 @@ class UI(QMainWindow):
         self.threadpool = QtCore.QThreadPool()
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
-        # search for cameras connected to the computer and supported by installed drivers
+        # Set initial camera variables and buttons
         self.liveView = False
         self.camera_type = None
         self.camera_model = None
-        self.file_format = ".tif"
-        # self.DSLR_read_out = False
-        self.ActiveSavingProcess = False
+        self.file_format = ".jpg"
+        self.DSLR_read_out = False
+        # self.ActiveSavingProcess = False
 
         self.ui.pushButton_camera_3.pressed.connect(self.begin_live_view)
         self.ui.spinBox_camera_3_exposure.valueChanged.connect(self.set_exposure_manual)
@@ -133,13 +133,13 @@ class UI(QMainWindow):
             self.log_info(message)
             print(message)
             self.FLIR_found = False
-            self.disable_FLIR_inputs()
+            self.disable_inputs()
         except ModuleNotFoundError:
             message = "PYSPIN has not been installed - Disabling FLIR camera inputs"
             self.log_info(message)
             print(message)
             self.FLIR_found = False
-            self.disable_FLIR_inputs()
+            self.disable_inputs()
 
         # Select output folder
         self.output_location = str(Path.cwd())
@@ -286,6 +286,26 @@ class UI(QMainWindow):
             self.log_info("Loaded config-file successfully!")
 
             print(config)
+
+    
+    def disable_inputs(self):
+        self.ui.pushButton_camera_3.setEnabled(False)
+        self.ui.spinBox_camera_3_exposure.setEnabled(False)
+        self.ui.doubleSpinBox_camera_3_gain.setEnabled(False)
+        self.ui.doubleSpinBox_camera_3_gamma.setEnabled(False)
+        self.ui.pushButton_capture.setEnabled(False)
+        self.ui.pushButton_outputFolder.setEnabled(False)
+        self.ui.pushButton_load_config.setEnabled(False)
+
+    def enable_inputs(self):
+        # self.ui.stacked_camera_settings.setCurrentIndex(0)
+        self.ui.pushButton_camera_3.setEnabled(True)
+        self.ui.spinBox_camera_3_exposure.setEnabled(True)
+        self.ui.doubleSpinBox_camera_3_gain.setEnabled(True)
+        self.ui.doubleSpinBox_camera_3_gamma.setEnabled(True)
+        self.ui.pushButton_capture.setEnabled(True)
+        self.ui.pushButton_outputFolder.setEnabled(True)
+        self.ui.pushButton_load_config.setEnabled(True)
 
     def closeEvent(self, event):
         # report the program is to be closed so threads can be exited
