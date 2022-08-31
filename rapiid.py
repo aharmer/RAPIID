@@ -11,6 +11,13 @@ from qt_material import apply_stylesheet
 import scripts.ymlRW as ymlRW
 import cv2
 
+'''
+If digiCamControl will not read settings from cameras, may need to run line below in a cmd window.
+I think this is to enable MTP, it worked but not entirely sure why.
+
+net localgroup Administrators local service /add
+'''
+
 class WorkerSignals(QtCore.QObject):
     '''
     Defines the signals available from a running worker thread.
@@ -101,7 +108,7 @@ class UI(QMainWindow):
         self.camera_type = None
         self.camera_model = None
         self.file_format = ".jpg"
-        self.DSLR_read_out = False
+        # self.DSLR_read_out = False
         # self.ActiveSavingProcess = False
 
         self.ui.pushButton_camera_3.pressed.connect(self.begin_live_view)
@@ -109,9 +116,9 @@ class UI(QMainWindow):
         self.ui.doubleSpinBox_camera_3_gain.valueChanged.connect(self.set_gain_manual)
         self.ui.doubleSpinBox_camera_3_gamma.valueChanged.connect(self.set_gamma)
 
-        self.ui.pushButton_capture.pressed.connect(self.capture_image)
+        self.ui.pushButton_capture.pressed.connect(self.capture_set)
 
-        # Find FLIR cameras, if attached
+        # Find and initialise FLIR cameras, if attached
         try:
             from scripts.rapiid_FLIR import customFLIR
             self.FLIR = customFLIR()
@@ -193,7 +200,7 @@ class UI(QMainWindow):
 
     def begin_live_view(self):
         if not self.liveView:
-            self.log_info("Began camera live view")
+            self.log_info("Began camera live view.")
             self.ui.pushButton_camera_3.setText("Stop Live View")
             self.liveView = True
 
@@ -228,19 +235,44 @@ class UI(QMainWindow):
             self.log_info("Gain set to " + str(value))
             self.cam.set_gamma(float(value))
 
+    
+    def capture_set(self):
+        self.output_location_folder = Path(self.output_location).joinpath(self.ui.lineEdit_project.text()).joinpath(self.ui.lineEdit_accession.text())
+        if os.path.exists(self.output_location_folder):
+            self.show_popup()
+
+        else:
+            self.capture_image()
+
+    def show_popup(self):
+        msg = QMessageBox()
+        msg.setWindowTitle("RAPIID Dialog")
+        msg.setText("A folder with this accession number already exists!")
+        msg.setInformativeText("Do you want to overwrite the existing files?")
+        msg.setIcon(QMessageBox.Warning)
+        msg.setStandardButtons(QMessageBox.Yes|QMessageBox.Cancel)
+        msg.setDefaultButton(QMessageBox.Cancel)
+
+        msg.buttonClicked.connect(self.popup_button)
+
+        x = msg.exec_()
+
+    def popup_button(self, i):
+        self.capture_image()
+
     def capture_image(self):
         now = datetime.datetime.now()
         self.create_output_folders()
         # create unique filename
-        file_name = str(self.output_location_folder.joinpath(self.ui.lineEdit.text() + "_label1" + self.file_format))
+        file_name = str(self.output_location_folder.joinpath(self.ui.lineEdit_accession.text() + "_label1" + self.file_format))
         self.cam.capture_image(file_name)
-        self.log_info("Captured " + file_name)
+        self.log_info("Captured " + str(self.ui.lineEdit_accession.text() + "_label1" + self.file_format))
 
     def create_output_folders(self):
-        self.output_location_folder = Path(self.output_location).joinpath(self.ui.lineEdit.text())
+        self.output_location_folder = Path(self.output_location).joinpath(self.ui.lineEdit_project.text()).joinpath(self.ui.lineEdit_accession.text())
         if not os.path.exists(self.output_location_folder):
             os.makedirs(self.output_location_folder)
-            self.log_info("Created folder at: " + str(self.output_location_folder))
+            self.log_info("Created folder: " + str(self.ui.lineEdit_project.text() + self.ui.lineEdit_accession.text()))
 
     def loadConfig(self):
         file = QtWidgets.QFileDialog.getOpenFileName(self, "Load existing config file", str(Path.cwd()), "config file (*.yaml)")
@@ -266,19 +298,6 @@ class UI(QMainWindow):
                 self.ui.doubleSpinBox_camera_3_gamma.setValue(config["camera_settings"]["gamma"])
                 self.set_gamma()
 
-            # else:
-            #     # DSLR
-            #     self.ui.comboBox_shutterSpeed.setCurrentIndex(
-            #         self.ui.comboBox_shutterSpeed.findText(str(config["camera_settings"]["shutterspeed"])))
-            #     self.ui.comboBox_aperture.setCurrentIndex(
-            #         self.ui.comboBox_aperture.findText(str(config["camera_settings"]["aperture"])))
-            #     self.ui.comboBox_iso.setCurrentIndex(
-            #         self.ui.comboBox_iso.findText(str(config["camera_settings"]["iso"])))
-            #     self.ui.comboBox_whiteBalance.setCurrentIndex(
-            #         self.ui.comboBox_whiteBalance.findText(str(config["camera_settings"]["whitebalance"])))
-            #     self.ui.comboBox_compression.setCurrentIndex(
-            #         self.ui.comboBox_compression.findText(str(config["camera_settings"]["compression"])))
-
             # meta data (exif)
             self.exif = config["exif_data"]
 
@@ -286,6 +305,60 @@ class UI(QMainWindow):
             self.log_info("Loaded config-file successfully!")
 
             print(config)
+
+    # def writeConfig(self):
+    #     if self.ui.comboBox_stackingMethod.currentIndex() == 0:
+    #         stacking_method = "default"
+    #     elif self.ui.comboBox_stackingMethod.currentIndex() == 1:
+    #         stacking_method = "1-star"
+    #     elif self.ui.comboBox_stackingMethod.currentIndex() == 2:
+    #         stacking_method = "mask"
+
+    #     if self.camera_type == "DSLR":
+    #         self.get_DSLR_file_ending()
+
+    #     config = {'general': {'project_name': self.ui.lineEdit_projectName.text(),
+    #                           'camera_type': self.camera_type,
+    #                           'camera_model': self.camera_model,
+    #                           },
+    #               'camera_settings': {'exposure_auto': self.ui.checkBox_exposureAuto.isChecked(),
+    #                                   'exposure_time': self.ui.doubleSpinBox_exposureTime.value(),
+    #                                   'gain_auto': self.ui.checkBox_gainAuto.isChecked(),
+    #                                   'gain_level': self.ui.doubleSpinBox_gainLevel.value(),
+    #                                   'gamma': self.ui.doubleSpinBox_gamma.value(),
+    #                                   'balance_ratio_red': self.ui.doubleSpinBox_balanceRatioRed.value(),
+    #                                   'balance_ratio_blue': self.ui.doubleSpinBox_balanceRatioBlue.value(),
+    #                                   # values specific to DSLR cameras
+    #                                   'shutterspeed': self.ui.comboBox_shutterSpeed.currentText(),
+    #                                   'aperture': self.ui.comboBox_aperture.currentText(),
+    #                                   'iso': self.ui.comboBox_iso.currentText(),
+    #                                   'whitebalance': self.ui.comboBox_whiteBalance.currentText(),
+    #                                   'compression': self.ui.comboBox_compression.currentText()
+    #                                   },
+    #               'scanner_settings': {'x_min': self.ui.doubleSpinBox_xMin.value(),
+    #                                    'x_max': self.ui.doubleSpinBox_xMax.value(),
+    #                                    'x_step': self.ui.doubleSpinBox_xStep.value(),
+    #                                    'y_min': self.ui.doubleSpinBox_yMin.value(),
+    #                                    'y_max': self.ui.doubleSpinBox_yMax.value(),
+    #                                    'y_step': self.ui.doubleSpinBox_yStep.value(),
+    #                                    'z_min': self.ui.doubleSpinBox_zMin.value(),
+    #                                    'z_max': self.ui.doubleSpinBox_zMax.value(),
+    #                                    'z_step': self.ui.doubleSpinBox_zStep.value()},
+    #               'stacking': {'stack_images': self.ui.checkBox_stackImages.isChecked(),
+    #                            'stacking_method': stacking_method,
+    #                            'threshold': self.ui.spinBox_thresholdFocus.value(),
+    #                            'display_focus_check': self.stackDisplayFocus,
+    #                            'additional_sharpening': self.stackSharpen},
+    #               'masking': {'mask_images': self.ui.checkBox_maskImages.isChecked(),
+    #                           'mask_thresh_min': self.ui.spinBox_thresholdMin.value(),
+    #                           'mask_thresh_max': self.ui.spinBox_thresholdMax.value(),
+    #                           'min_artifact_size_black': self.maskArtifactSizeBlack,
+    #                           'min_artifact_size_white': self.maskArtifactSizeWhite},
+    #               "exif_data": self.exif}
+
+    #     self.create_output_folders()
+    #     ymlRW.write_config_file(config, Path(self.output_location_folder))
+    #     self.log_info("Exported config_file successfully!")
 
     
     def disable_inputs(self):

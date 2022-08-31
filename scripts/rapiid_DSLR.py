@@ -22,103 +22,112 @@ class customDSLR():
             for i, camera in enumerate(self.cameras):
                 self.cameras[i] = camera.split("\n")[0]  # remove line break from each entry
 
-            # by default, set the first found camera as active
-            self.camera_model = self.cameras[0]
+            # assign cameras
+            self.camera_model_dorsal = self.cameras[0]
+            self.camera_model_lateral = self.cameras[1]
 
-            if self.camera_model[0:4] == "digi" or not self.camera_model:
-                print("No camera detected!")
-                self.camera_model = None
+            if self.camera_model_dorsal[0:4] == "digi" or not self.camera_model:
+                print("Dorsal camera not detected!")
+                self.camera_model_dorsal = None
                 return
             else:
-                print("Detected DSLR cameras:", *self.cameras, sep=' ')
-                print("Using:", self.camera_model)
+                # print("Detected DSLR cameras:", *self.cameras, sep=' ')
+                print("Dorsal camera detected, using:", self.camera_model_dorsal)
+
+            if self.camera_model_lateral[0:4] == "digi" or not self.camera_model:
+                print("Lateral camera not detected!")
+                self.camera_model_lateral = None
+                return
+            else:
+                # print("Detected DSLR cameras:", *self.cameras, sep=' ')
+                print(""Lateral" camera detected, using:", self.camera_model_lateral)
         except IndexError:
-            print("No DSLR detected!")
+            print("No cameras detected!")
             return
 
         # get all values as soon as camera is initialised
-        self.all_iso_vals = []
-        self.all_aperture_vals = []
-        self.all_shutterspeed_vals = []
-        self.all_whitebalance_vals = []
-        self.all_compression_vals = []
+        # self.all_iso_vals = []
+        # self.all_aperture_vals = []
+        # self.all_shutterspeed_vals = []
+        # self.all_whitebalance_vals = []
+        # self.all_compression_vals = []
 
-        self.shutterspeed = None
-        self.aperture = None
-        self.iso = None
-        self.whitebalance = None
-        self.compression = None
+        # self.shutterspeed = None
+        # self.aperture = None
+        # self.iso = None
+        # self.whitebalance = None
+        # self.compression = None
 
-    def initialise_camera(self):
-        # launch DigiCamControl
-        subprocess.Popen('"' + str(digi_cam_app_path) + '"')
+    # def initialise_camera(self):
+    #     # launch DigiCamControl
+    #     # subprocess.Popen('"' + str(digi_cam_app_path) + '"')
 
-        # check for instance of CameraControl.exe for 20 seconds until timeout
-        for i in range(20):
-            sleep(1)
-            sp = subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c list sessions", stdout=subprocess.PIPE, universal_newlines=True, shell=False)
-            (output, err) = sp.communicate()
-            message = str(output).split(":")[-1].split("\n")[0]
-            if message == "no camera is connected":
-                print("Waiting for instance of CameraControl.exe to launch...")
-            else:
-                print(message)
-                print("CameraControl.exe launched successfully!")
-                sleep(2)
-                break
+    #     # check for instance of CameraControl.exe for 20 seconds until timeout
+    #     for i in range(20):
+    #         sleep(1)
+    #         sp = subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c list sessions", stdout=subprocess.PIPE, universal_newlines=True, shell=False)
+    #         (output, err) = sp.communicate()
+    #         message = str(output).split(":")[-1].split("\n")[0]
+    #         if message == "no camera is connected":
+    #             print("Waiting for instance of CameraControl.exe to launch...")
+    #         else:
+    #             print(message)
+    #             print("CameraControl.exe launched successfully!")
+    #             sleep(2)
+    #             break
 
-            if i == 19:
-                print("Timeout! No response from Camera or CameraControl.exe!")
-                return
+    #         if i == 19:
+    #             print("Timeout! No response from Camera or CameraControl.exe!")
+    #             return
 
-        # iso
-        self.all_iso_vals = self.get_all_settings("iso")
-        self.iso = self.get_current_setting("iso")
-        # aperture
-        self.all_aperture_vals = self.get_all_settings("aperture")
-        self.aperture = self.get_current_setting("aperture")
-        # shutter speed
-        self.all_shutterspeed_vals = self.get_all_settings("shutterspeed")
-        self.shutterspeed = self.get_current_setting("shutterspeed")
-        # white balance
-        self.all_whitebalance_vals = self.get_all_settings("whitebalance")
-        self.whitebalance = self.get_current_setting("whitebalance")
-        # compression setting
-        self.all_compression_vals = self.get_all_settings("compressionsetting")
-        self.compression = self.get_current_setting("compressionsetting")
+    #     # iso
+    #     self.all_iso_vals = self.get_all_settings("iso")
+    #     self.iso = self.get_current_setting("iso")
+    #     # aperture
+    #     self.all_aperture_vals = self.get_all_settings("aperture")
+    #     self.aperture = self.get_current_setting("aperture")
+    #     # shutter speed
+    #     self.all_shutterspeed_vals = self.get_all_settings("shutterspeed")
+    #     self.shutterspeed = self.get_current_setting("shutterspeed")
+    #     # white balance
+    #     self.all_whitebalance_vals = self.get_all_settings("whitebalance")
+    #     self.whitebalance = self.get_current_setting("whitebalance")
+    #     # compression setting
+    #     self.all_compression_vals = self.get_all_settings("compressionsetting")
+    #     self.compression = self.get_current_setting("compressionsetting")
 
-        print("Successfully initialised camera!")
+    #     print("Successfully initialised camera!")
 
-    def get_all_settings(self, key):
-        sleep(0.2)  # prevents issuing to many commands at a time
-        sp = subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c list " + key,
-                              stdout=subprocess.PIPE, universal_newlines=True, shell=False)
-        (output, err) = sp.communicate()
-        raw_vals = (str(output).split("[")[-1].split("]")[0].split(","))
-        all_vals = []
-        for val in raw_vals:
-            all_vals.append(val.split('"')[1])
-        return all_vals
+    # def get_all_settings(self, key):
+    #     sleep(0.2)  # prevents issuing to many commands at a time
+    #     sp = subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c list " + key,
+    #                           stdout=subprocess.PIPE, universal_newlines=True, shell=False)
+    #     (output, err) = sp.communicate()
+    #     raw_vals = (str(output).split("[")[-1].split("]")[0].split(","))
+    #     all_vals = []
+    #     for val in raw_vals:
+    #         all_vals.append(val.split('"')[1])
+    #     return all_vals
 
-    def set_shutterspeed(self, shutterspeed="1/100"):
-        subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set shutterspeed " + shutterspeed,
-                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    # def set_shutterspeed(self, shutterspeed="1/100"):
+    #     subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set shutterspeed " + shutterspeed,
+    #                      stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
-    def set_iso(self, iso="500"):
-        subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set iso " + iso,
-                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    # def set_iso(self, iso="500"):
+    #     subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set iso " + iso,
+    #                      stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
-    def set_aperture(self, aperture="5.6"):
-        subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set aperture " + aperture,
-                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    # def set_aperture(self, aperture="5.6"):
+    #     subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set aperture " + aperture,
+    #                      stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
-    def set_whitebalance(self, whitebalance="Auto"):
-        subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set whitebalance " + whitebalance,
-                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    # def set_whitebalance(self, whitebalance="Auto"):
+    #     subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set whitebalance " + whitebalance,
+    #                      stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
-    def set_compression(self, compression):
-        subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set compressionsetting " + compression,
-                         stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+    # def set_compression(self, compression):
+    #     subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + " /c set compressionsetting " + compression,
+    #                      stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
     def start_live_view(self):
         # open live view window
@@ -134,14 +143,14 @@ class customDSLR():
         subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + ' /c CaptureNoAf "' + img_name + '"',
                          stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
-    def get_current_setting(self, setting):
-        sleep(0.2)  # prevents issuing to many commands at a time
-        sp = subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + ' /c get ' + setting,
-                              stdout=subprocess.PIPE, universal_newlines=True, shell=False)
-        (output, err) = sp.communicate()
-        val = output.split('"')[1]
-        print("Current " + setting + " : " + val)
-        return val
+    # def get_current_setting(self, setting):
+    #     sleep(0.2)  # prevents issuing to many commands at a time
+    #     sp = subprocess.Popen('"' + str(digi_cam_remote_path) + '"' + ' /c get ' + setting,
+    #                           stdout=subprocess.PIPE, universal_newlines=True, shell=False)
+    #     (output, err) = sp.communicate()
+    #     val = output.split('"')[1]
+    #     print("Current " + setting + " : " + val)
+    #     return val
 
 
 if __name__ == '__main__':
