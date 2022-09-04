@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2317</width>
-    <height>1128</height>
+    <width>2311</width>
+    <height>1110</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,8 +25,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>2297</width>
-         <height>1108</height>
+         <width>2291</width>
+         <height>1090</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -71,19 +71,28 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="camera_1_aperture_label">
+                  <widget class="QLabel" name="camera_1_exposure_label">
                    <property name="text">
-                    <string>Aperture</string>
+                    <string>Exposure time (us)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_aperture">
+                  <widget class="QSpinBox" name="spinBox_camera_1_exposure">
                    <property name="buttonSymbols">
                     <enum>QAbstractSpinBox::UpDownArrows</enum>
                    </property>
+                   <property name="minimum">
+                    <number>1000</number>
+                   </property>
+                   <property name="maximum">
+                    <number>1000000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10000</number>
+                   </property>
                    <property name="value">
-                    <double>0.000000000000000</double>
+                    <number>90000</number>
                    </property>
                   </widget>
                  </item>
@@ -95,28 +104,48 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="camera_1_shutterspeed_label">
+                  <widget class="QLabel" name="camera_1_gain_label">
                    <property name="text">
-                    <string>Shutterspeed</string>
+                    <string>Gain level (dB)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_camera_1_shutterspeed"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gain">
+                   <property name="maximum">
+                    <double>25.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>1.830000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <widget class="QLabel" name="camera_1_ISO_label">
+                  <widget class="QLabel" name="camera_1_gamma_label">
                    <property name="text">
-                    <string>ISO</string>
+                    <string>Gamma correction</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_camera_1_ISO"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gamma">
+                   <property name="minimum">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>4.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.800000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -203,12 +232,25 @@
                  <item>
                   <widget class="QLabel" name="label_20">
                    <property name="text">
-                    <string>Aperture</string>
+                    <string>Exposure time (us)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_7"/>
+                  <widget class="QSpinBox" name="spinBox_7">
+                   <property name="minimum">
+                    <number>1000</number>
+                   </property>
+                   <property name="maximum">
+                    <number>1000000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10000</number>
+                   </property>
+                   <property name="value">
+                    <number>90000</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -220,12 +262,19 @@
                  <item>
                   <widget class="QLabel" name="label_21">
                    <property name="text">
-                    <string>Shutterspeed</string>
+                    <string>Gain level (dB)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_8"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+                   <property name="maximum">
+                    <double>25.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>1.830000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -234,12 +283,25 @@
                  <item>
                   <widget class="QLabel" name="label_22">
                    <property name="text">
-                    <string>ISO</string>
+                    <string>Gamma correction</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_9"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+                   <property name="minimum">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>4.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.800000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -343,7 +405,7 @@
                     <number>1000000</number>
                    </property>
                    <property name="singleStep">
-                    <number>1000</number>
+                    <number>10000</number>
                    </property>
                    <property name="value">
                     <number>90000</number>
@@ -488,7 +550,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_10"/>
+                  <widget class="QSpinBox" name="spinBox_10">
+                   <property name="minimum">
+                    <number>1000</number>
+                   </property>
+                   <property name="maximum">
+                    <number>1000000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10000</number>
+                   </property>
+                   <property name="value">
+                    <number>90000</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -505,7 +580,14 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_11"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
+                   <property name="maximum">
+                    <double>25.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>1.830000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -519,7 +601,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_12"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
+                   <property name="minimum">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>4.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.800000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -609,7 +704,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_16"/>
+                  <widget class="QSpinBox" name="spinBox_16">
+                   <property name="minimum">
+                    <number>1000</number>
+                   </property>
+                   <property name="maximum">
+                    <number>1000000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10000</number>
+                   </property>
+                   <property name="value">
+                    <number>90000</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -626,7 +734,14 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_17"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_17">
+                   <property name="maximum">
+                    <double>25.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>1.830000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -640,7 +755,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_18"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_18">
+                   <property name="minimum">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>4.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.800000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -729,7 +857,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_19"/>
+                  <widget class="QSpinBox" name="spinBox_19">
+                   <property name="minimum">
+                    <number>1000</number>
+                   </property>
+                   <property name="maximum">
+                    <number>1000000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10000</number>
+                   </property>
+                   <property name="value">
+                    <number>90000</number>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -746,7 +887,14 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_20"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_20">
+                   <property name="maximum">
+                    <double>25.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>1.830000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
@@ -760,7 +908,20 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_21"/>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_21">
+                   <property name="minimum">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>4.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.800000000000000</double>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>
