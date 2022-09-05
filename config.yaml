@@ -3,6 +3,10 @@ general:
   camera_type: FLIR
   camera_model: BFS-U3-200S6C-C
 camera_settings:
+  camera_1:
+    exposure_time: 90000.0
+    gain_level: 1.83
+    gamma: 0.8
   camera_3:
     exposure_time: 90000.0
     gain_level: 1.83

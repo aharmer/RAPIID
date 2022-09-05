@@ -82,6 +82,9 @@
                    <property name="buttonSymbols">
                     <enum>QAbstractSpinBox::UpDownArrows</enum>
                    </property>
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <number>1000</number>
                    </property>
@@ -112,6 +115,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gain">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="maximum">
                     <double>25.000000000000000</double>
                    </property>
@@ -133,6 +139,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gamma">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <double>0.100000000000000</double>
                    </property>
@@ -173,16 +182,19 @@
              </item>
              <item>
               <widget class="QLabel" name="camera_1">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+               <property name="enabled">
+                <bool>true</bool>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>180</width>
-                 <height>135</height>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>540</width>
+                 <height>405</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -238,6 +250,9 @@
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spinBox_7">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <number>1000</number>
                    </property>
@@ -268,6 +283,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="maximum">
                     <double>25.000000000000000</double>
                    </property>
@@ -289,6 +307,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <double>0.100000000000000</double>
                    </property>
@@ -329,16 +350,16 @@
              </item>
              <item>
               <widget class="QLabel" name="label_4">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
-                 <width>180</width>
-                 <height>135</height>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>540</width>
+                 <height>405</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -398,6 +419,9 @@
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spinBox_camera_3_exposure">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <number>1000</number>
                    </property>
@@ -428,6 +452,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_3_gain">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="maximum">
                     <double>25.000000000000000</double>
                    </property>
@@ -449,6 +476,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_3_gamma">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <double>0.100000000000000</double>
                    </property>
@@ -489,16 +519,16 @@
              </item>
              <item>
               <widget class="QLabel" name="camera_3">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
-                 <width>180</width>
-                 <height>135</height>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>540</width>
+                 <height>405</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -551,6 +581,9 @@
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spinBox_10">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <number>1000</number>
                    </property>
@@ -581,6 +614,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="maximum">
                     <double>25.000000000000000</double>
                    </property>
@@ -602,6 +638,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <double>0.100000000000000</double>
                    </property>
@@ -642,16 +681,16 @@
              </item>
              <item>
               <widget class="QLabel" name="label_8">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
-                 <width>180</width>
-                 <height>135</height>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>540</width>
+                 <height>16777215</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -705,6 +744,9 @@
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spinBox_16">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <number>1000</number>
                    </property>
@@ -735,6 +777,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_17">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="maximum">
                     <double>25.000000000000000</double>
                    </property>
@@ -756,6 +801,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_18">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <double>0.100000000000000</double>
                    </property>
@@ -796,16 +844,16 @@
              </item>
              <item>
               <widget class="QLabel" name="label_10">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
-                 <width>180</width>
-                 <height>135</height>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>540</width>
+                 <height>405</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -858,6 +906,9 @@
                  </item>
                  <item>
                   <widget class="QSpinBox" name="spinBox_19">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <number>1000</number>
                    </property>
@@ -888,6 +939,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_20">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="maximum">
                     <double>25.000000000000000</double>
                    </property>
@@ -909,6 +963,9 @@
                  </item>
                  <item>
                   <widget class="QDoubleSpinBox" name="doubleSpinBox_21">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
                    <property name="minimum">
                     <double>0.100000000000000</double>
                    </property>
@@ -949,16 +1006,16 @@
              </item>
              <item>
               <widget class="QLabel" name="label_12">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
                <property name="minimumSize">
                 <size>
-                 <width>180</width>
-                 <height>135</height>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>540</width>
+                 <height>405</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -1029,6 +1086,22 @@
                </widget>
               </item>
               <item>
+               <spacer name="verticalSpacer_4">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
                <widget class="QPushButton" name="pushButton_outputFolder">
                 <property name="text">
                  <string>Output folder...</string>
@@ -1052,7 +1125,7 @@
                </widget>
               </item>
               <item>
-               <spacer name="verticalSpacer_2">
+               <spacer name="verticalSpacer">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>
                 </property>
@@ -1062,7 +1135,7 @@
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>20</width>
-                  <height>15</height>
+                  <height>5</height>
                  </size>
                 </property>
                </spacer>
@@ -1076,7 +1149,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Project Name</string>
+                 <string>Project name</string>
                 </property>
                </widget>
               </item>
@@ -1112,6 +1185,22 @@
                <widget class="QLineEdit" name="lineEdit_accession"/>
               </item>
               <item>
+               <spacer name="verticalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Fixed</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>50</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
                <widget class="QPushButton" name="pushButton_capture">
                 <property name="font">
                  <font>
@@ -1130,12 +1219,12 @@
                  <enum>Qt::Vertical</enum>
                 </property>
                 <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
+                 <enum>QSizePolicy::Expanding</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>20</width>
-                  <height>15</height>
+                  <height>20</height>
                  </size>
                 </property>
                </spacer>
@@ -1152,7 +1241,7 @@
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>200</height>
+                  <height>300</height>
                  </size>
                 </property>
                 <property name="maximumSize">
@@ -1179,19 +1268,6 @@
                  <bool>true</bool>
                 </property>
                </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
              </layout>
             </widget>
