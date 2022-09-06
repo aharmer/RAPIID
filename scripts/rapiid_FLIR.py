@@ -24,8 +24,18 @@ class customFLIR():
         print('Spinnaker library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
 
         # Retrieve list of cameras from the system
-        self.cam_list = self.system.GetCameras()
+        serial_1 = '21447407'
+        serial_3 = '21188171'
 
+        self.cam_list_raw = self.system.GetCameras()
+
+        cam_1 = self.cam_list_raw.GetBySerial(serial_1)
+        cam_3 = self.cam_list_raw.GetBySerial(serial_3) 
+
+        self.cam_list = [cam_1, cam_3]
+
+        # self.cam_list_raw = self.system.GetCameras()
+        
         # get all serial numbers of connected and support FLIR cameras
         self.device_names = []
 
@@ -41,7 +51,7 @@ class customFLIR():
 
             print("Detected", self.device_names[id][0], "with Serial ID", self.device_names[id][1])
 
-        num_cameras = self.cam_list.GetSize()
+        num_cameras = len(self.cam_list)
 
         print('Number of cameras detected: %d' % num_cameras)
 
@@ -56,9 +66,6 @@ class customFLIR():
             print('Not enough cameras!')
             input('Done! Press Enter to close the app...')
             return False
-
-        # print("\nExecute CustomFLIR.initialise_camera and pass the number of the listed camera, "
-              # "in case more than one has been detected!\n")
 
     def initialise_camera(self, select_cam = 0):
         # overwrite the selected cam at initialisation if desired
@@ -84,13 +91,6 @@ class customFLIR():
         # Begin Acquisition of image stream
         self.cam.BeginAcquisition()
 
-    # def deinitialise_camera(self, select_cam = 0):
-    #     self.cam = self.cam_list[select_cam]
-    #     # required to release camera for other applications in case another one is selected while running scAnt
-    #     self.cam.EndAcquisition()
-    #     # Deinitialize camera
-    #     self.cam.DeInit()
-
     def configure_exposure(self, select_cam = 0, exposure = 100000):
         """
          This function configures a custom exposure time. Automatic exposure is turned
@@ -105,8 +105,6 @@ class customFLIR():
 
         self.cam = self.cam_list[select_cam]
 
-        # print('*** CONFIGURING EXPOSURE ***\n')
-
         try:
             result = True
 
@@ -115,18 +113,14 @@ class customFLIR():
                 return False
 
             self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-            # print('Automatic exposure disabled...')
 
             if self.cam.ExposureTime.GetAccessMode() != PySpin.RW:
                 print('Unable to set exposure time. Aborting...')
                 return False
 
             # Ensure desired exposure time does not exceed the maximum
-            # 90000  # with grey backdrop and full illumination
-            # 200751  # with grey backdrop and half illumination
             exposure = min(self.cam.ExposureTime.GetMax(), exposure)
             self.cam.ExposureTime.SetValue(exposure)
-            # print('Exposure time set to %s us...\n' % exposure)
 
 
         except PySpin.SpinnakerException as ex:
@@ -143,112 +137,6 @@ class customFLIR():
     def set_gamma(self, select_cam = 0, gamma = 0.8):
         self.cam = self.cam_list[select_cam]
         self.cam.Gamma.SetValue(gamma)
-
-    # def reset_exposure(self):
-    #     """
-    #     This function returns the camera to a normal state by re-enabling automatic exposure.
-
-    #     :param cam: Camera to reset exposure on.
-    #     :type cam: CameraPtr
-    #     :return: True if successful, False otherwise.
-    #     :rtype: bool
-    #     """
-    #     # self.cam = self.cam_list[select_cam]
-
-    #     try:
-    #         result = True
-
-    #         # Turn automatic exposure back on
-    #         #
-    #         # *** NOTES ***
-    #         # Automatic exposure is turned on in order to return the camera to its
-    #         # default state.
-
-    #         if self.cam.ExposureAuto.GetAccessMode() != PySpin.RW:
-    #             print('Unable to enable automatic exposure (node retrieval). Non-fatal error...')
-    #             return False
-
-    #         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Continuous)
-
-    #         print('Automatic exposure enabled...')
-
-    #     except PySpin.SpinnakerException as ex:
-    #         print('Error: %s' % ex)
-    #         result = False
-
-    #     return result
-
-    # def reset_gain(self):
-    #     """
-    #     This function returns the camera to a normal state by re-enabling automatic exposure.
-
-    #     :param cam: Camera to reset exposure on.
-    #     :type cam: CameraPtr
-    #     :return: True if successful, False otherwise.
-    #     :rtype: bool
-    #     """
-    #     # self.cam = self.cam_list[select_cam]
-
-    #     try:
-    #         result = True
-
-    #         # Turn automatic exposure back on
-    #         #
-    #         # *** NOTES ***
-    #         # Automatic exposure is turned on in order to return the camera to its
-    #         # default state.
-
-    #         if self.cam.GainAuto.GetAccessMode() != PySpin.RW:
-    #             print('Unable to enable automatic gain (node retrieval). Non-fatal error...')
-    #             return False
-
-    #         self.cam.GainAuto.SetValue(PySpin.GainAuto_Continuous)
-
-    #         print('Automatic gain enabled...')
-
-    #     except PySpin.SpinnakerException as ex:
-    #         print('Error: %s' % ex)
-    #         result = False
-
-    #     return result
-
-    # def print_device_info(self):
-    #     """
-    #     This function prints the device information of the camera from the transport
-    #     layer; please see NodeMapInfo example for more in-depth comments on printing
-    #     device information from the nodemap.
-
-    #     :param cam: Camera to get device information from.
-    #     :type cam: CameraPtr
-    #     :return: True if successful, False otherwise.
-    #     :rtype: bool
-    #     """
-    #     # self.cam = self.cam_list[select_cam]
-
-    #     print('*** DEVICE INFORMATION ***\n')
-
-    #     try:
-    #         result = True
-    #         nodemap = self.cam.GetTLDeviceNodeMap()
-
-    #         node_device_information = PySpin.CCategoryPtr(nodemap.GetNode('DeviceInformation'))
-
-    #         if PySpin.IsAvailable(node_device_information) and PySpin.IsReadable(node_device_information):
-    #             features = node_device_information.GetFeatures()
-    #             for feature in features:
-    #                 node_feature = PySpin.CValuePtr(feature)
-    #                 """
-    #                 print('%s: %s' % (node_feature.GetName(),
-    #                                   node_feature.ToString() if PySpin.IsReadable(node_feature) else 'Node not readable'))
-    #                 """
-    #         else:
-    #             print('Device control information not available.')
-
-    #     except PySpin.SpinnakerException as ex:
-    #         print('Error: %s' % ex.message)
-    #         return False
-
-    #     return result
 
     def live_view(self, select_cam = 0):
         """
@@ -347,7 +235,7 @@ class customFLIR():
 
     def releasePySpin(self):
         # Clear camera list before releasing system
-        self.cam_list.Clear()
+        self.cam_list_raw.Clear()
 
         # Release system instance
         self.system.ReleaseInstance()

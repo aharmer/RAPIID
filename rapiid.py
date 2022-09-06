@@ -278,19 +278,6 @@ class UI(QMainWindow):
             self.capture_image(select_cam = 1, tag = "_label_1")
             self.ui.pushButton_capture.setEnabled(True)
 
-    # def show_popup(self):
-    #     msg = QMessageBox()
-    #     msg.setWindowTitle("RAPIID Dialog")
-    #     msg.setText("A folder with this accession number already exists!")
-    #     msg.setInformativeText("Do you want to overwrite the existing files?")
-    #     msg.setIcon(QMessageBox.Warning)
-    #     msg.setStandardButtons(QMessageBox.Yes|QMessageBox.Cancel)
-    #     msg.setDefaultButton(QMessageBox.Cancel)
-
-    #     msg.buttonClicked.connect(self.popup_button)
-
-    #     self.button = msg.exec_()
-
     def show_popup(self):
         button = QMessageBox.question(self, "RAPIID Dialog", "A folder with this accession number already exists!\nDo you want to overwrite the existing files?")
 
