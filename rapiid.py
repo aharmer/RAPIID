@@ -7,16 +7,10 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from GUI.rapiid_GUI import Ui_MainWindow  # importing main window of the GUI
-from qt_material import apply_stylesheet
 import scripts.ymlRW as ymlRW
 import cv2
+from qt_material import apply_stylesheet
 
-'''
-If digiCamControl will not read settings from cameras, may need to run line below in a cmd window.
-I think this is to enable MTP, it worked but not entirely sure why.
-
-net localgroup Administrators local service /add
-'''
 
 class WorkerSignals(QtCore.QObject):
     '''
@@ -92,7 +86,7 @@ class UI(QMainWindow):
     def __init__(self):
         super(UI, self).__init__()
 
-        self.setWindowIcon(QtGui.QIcon(str(Path.cwd().joinpath("images", "RAPIID_icon2.png"))))
+        self.setWindowIcon(QtGui.QIcon(str(Path.cwd().joinpath("images", "RAPIID_icon.png"))))
 
         self.exit_program = False
 

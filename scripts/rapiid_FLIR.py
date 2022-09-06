@@ -1,14 +1,6 @@
 import cv2
-# import platform
 import numpy as np
 import time
-
-# as the PySpin class seems to be written differently for the windows library it needs to be imported as follows:
-# used_plattform = platform.system()
-
-# if used_plattform == "Linux":
-#     import PySpin
-# else:
 from PySpin import PySpin  # to run on windows
 
 
