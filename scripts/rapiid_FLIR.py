@@ -239,7 +239,7 @@ if __name__ == '__main__':
 
     # initialise camera
     FLIR = customFLIR()
-    FLIR.initialise_camera(select_cam=0)
+    FLIR.initialise_camera(select_cam = 0)
 
     # custom settings
     gain = 5
@@ -254,7 +254,7 @@ if __name__ == '__main__':
 
         cv2.waitKey(1)
 
-    FLIR.capture_image(img_name="testy_mac_test_face.tif")
+    FLIR.capture_image(img_name = "testy_mac_test_face.tif")
 
     # release camera
-    FLIR.exit_cam()
+    FLIR.exit_cam(select_cam = 0)
