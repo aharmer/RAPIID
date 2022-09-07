@@ -228,6 +228,7 @@ class customFLIR():
     def releasePySpin(self):
         # Clear camera list before releasing system
         self.cam_list_raw.Clear()
+        del self.cam_list
 
         # Release system instance
         self.system.ReleaseInstance()
