@@ -25,8 +25,6 @@ class customFLIR():
         cam_3 = self.cam_list_raw.GetBySerial(serial_3) 
 
         self.cam_list = [cam_1, cam_3]
-
-        # self.cam_list_raw = self.system.GetCameras()
         
         # get all serial numbers of connected and support FLIR cameras
         self.device_names = []
