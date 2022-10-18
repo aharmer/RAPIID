@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import time
+from itertools import chain
 from PySpin import PySpin  # to run on windows
 
 
@@ -16,20 +17,13 @@ class customFLIR():
         print('Spinnaker library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
 
         # Retrieve list of cameras from the system
-        serial_1 = '21447407'
-        serial_3 = '21188171'
 
         self.cam_list_raw = self.system.GetCameras()
-
-        cam_1 = self.cam_list_raw.GetBySerial(serial_1)
-        cam_3 = self.cam_list_raw.GetBySerial(serial_3) 
-
-        self.cam_list = [cam_1, cam_3]
         
         # get all serial numbers of connected and support FLIR cameras
         self.device_names = []
 
-        for id, cam in enumerate(self.cam_list):
+        for id, cam in enumerate(self.cam_list_raw):
             nodemap = cam.GetTLDeviceNodeMap()
 
             # Retrieve device serial number
@@ -41,21 +35,37 @@ class customFLIR():
 
             print("Detected", self.device_names[id][0], "with Serial ID", self.device_names[id][1])
 
-        num_cameras = len(self.cam_list)
+
+        serial_1 = '21447407'
+        serial_3 = '21188171'
+        
+        self.cam_list = [None]
+        if serial_1 in chain(*self.device_names):
+            cam_1 = self.cam_list_raw.GetBySerial(serial_1)
+            self.cam_list.insert(0, cam_1)
+        if serial_3 in chain(*self.device_names):
+            cam_3 = self.cam_list_raw.GetBySerial(serial_3)
+            self.cam_list.insert(1, cam_3)
+
+        # self.cam_list = [cam_1, cam_3]      
+
+
+        num_cameras = len(self.cam_list_raw)
 
         print('Number of cameras detected: %d' % num_cameras)
 
         # Finish if there are no cameras
         if num_cameras == 0:
             # Clear camera list before releasing system
-            self.cam_list.Clear()
+            self.cam_list_raw.Clear()
 
             # Release system instance
             self.system.ReleaseInstance()
 
-            print('Not enough cameras!')
-            input('Done! Press Enter to close the app...')
-            return False
+            print('\nNo cameras attached!')
+            print('Attach cameras and restart the app.')
+            print('App closed.')
+            return None
 
     def initialise_camera(self, select_cam = 0):
         # overwrite the selected cam at initialisation if desired

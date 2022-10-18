@@ -122,41 +122,58 @@ class UI(QMainWindow):
             from scripts.rapiid_FLIR import customFLIR
             self.FLIR = customFLIR()
             
+            if len(self.FLIR.cam_list_raw) == 0:
+                msg = QMessageBox()
+                msg.setWindowTitle("RAPIID Dialog")
+                msg.setText("No cameras attached!\nConnect cameras and restart the app.")
+                msg.setIcon(QMessageBox.Warning)
+                msg.setStandardButtons(QMessageBox.Ok)
+                msg.exec()
+                msg.buttonClicked.connect(self.closeApp())
+
             # Camera 1
-            try: 
-                self.FLIR.initialise_camera(select_cam = 0)
-                self.log_info("Dorsal camera successfully detected.")
-                self.ui.camera_1.setText("Dorsal camera successfully detected.")
-                self.camera_type = "FLIR"
-                # FLIR.device_names contains both model and serial number
-                self.camera_1_model = self.FLIR.device_names[0][0]
-                self.FLIR_found = True
-                self.FLIR_image_queue = []
-            except IndexError:
-                message1 = "Dorsal camera not detected!"
-                self.log_info(message1)
-                self.ui.camera_1.setText("Dorsal camera not detected!")
-                print(message1)
-                self.FLIR_found = False
-                self.disable_inputs(cam_id = 1)
+            if self.FLIR.cam_list[0]:
+                try: 
+                    self.FLIR.initialise_camera(select_cam = 0)
+                    self.log_info("Dorsal camera successfully initialised.")
+                    self.ui.camera_1.setText("Dorsal camera successfully initialised.")
+                    self.camera_type = "FLIR"
+                    self.camera_1_model = 'Blackfly S BFS-U3-200S6C'
+                    self.FLIR0_found = True
+                    self.FLIR_image_queue = []
+                except IndexError:
+                    message1 = "Dorsal camera not initialised!"
+                    self.log_info(message1)
+                    self.ui.camera_1.setText("Dorsal camera not initialised!")
+                    print(message1)
+                    self.FLIR0_found = False
+                    self.disable_inputs(cam_id = 1)
+            else:
+                self.FLIR0_found = False
+                print("Dorsal camera not connected!")
+                self.ui.camera_1.setText("Dorsal camera not connected.")
             
             # Camera 3
-            try: 
-                self.FLIR.initialise_camera(select_cam = 1)
-                self.log_info("Label camera 1 successfully detected.")
-                self.ui.camera_3.setText("Label camera 1 successfully detected.")
-                self.camera_type = "FLIR"
-                # FLIR.device_names contains both model and serial number
-                self.camera_3_model = self.FLIR.device_names[1][0]
-                self.FLIR_found = True
-                self.FLIR_image_queue = []
-            except IndexError:
-                message = "Label camera 1 not detected!"
-                self.log_info(message3)
-                self.ui.camera_3.setText("Label camera 1 not detected!")
-                print(message3)
-                self.FLIR_found = False
-                self.disable_inputs(cam_id = 3)
+            if self.FLIR.cam_list[1]:
+                try: 
+                    self.FLIR.initialise_camera(select_cam = 1)
+                    self.log_info("Label camera 1 successfully initialised.")
+                    self.ui.camera_3.setText("Label camera 1 successfully initialised.")
+                    self.camera_type = "FLIR"
+                    self.camera_3_model = 'Blackfly S BFS-U3-200S6M'
+                    self.FLIR1_found = True
+                    self.FLIR_image_queue = []
+                except IndexError:
+                    message3 = "Label camera 1 not initialised!"
+                    self.log_info(message3)
+                    self.ui.camera_3.setText("Label camera 1 not initialised!")
+                    print(message3)
+                    self.FLIR1_found = False
+                    self.disable_inputs(cam_id = 3)
+            else:
+                self.FLIR1_found = False
+                print("Label camera 1 not connected!")
+                self.ui.camera_3.setText("Label camera 1 not connected.")
         
         except ModuleNotFoundError:
             message = "PYSPIN has not been installed - Disabling FLIR camera inputs"
@@ -406,6 +423,11 @@ class UI(QMainWindow):
         self.ui.pushButton_outputFolder.setEnabled(True)
         self.ui.pushButton_load_config.setEnabled(True)
 
+    def closeApp(self):
+        self.FLIR0_found = False
+        self.FLIR1_found = False
+        sys.exit()
+
     def closeEvent(self, event):
         # report the program is to be closed so threads can be exited
         self.exit_program = True
@@ -416,9 +438,10 @@ class UI(QMainWindow):
         if self.liveView[1]:
             self.begin_live_view(cam_id = self.ui.camera_3, select_cam = 1, button_id = self.ui.pushButton_camera_3)
 
-        if self.camera_type == "FLIR":
-            # release cameras
+        # release cameras
+        if self.FLIR0_found:
             self.FLIR.exit_cam(0)
+        if self.FLIR1_found:
             self.FLIR.exit_cam(1)
 
         self.FLIR.releasePySpin()
