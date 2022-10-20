@@ -32,7 +32,7 @@
        <layout class="QHBoxLayout" name="horizontalLayout_9">
         <item>
          <widget class="QWidget" name="horizontalWidget" native="true">
-          <layout class="QHBoxLayout" name="horizontalLayout">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <property name="leftMargin">
             <number>10</number>
            </property>
@@ -48,7 +48,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout">
              <item>
-              <widget class="QLabel" name="camera_1_label">
+              <widget class="QLabel" name="camera_0_label">
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -64,21 +64,21 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <layout class="QHBoxLayout" name="horizontalLayout_0">
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_5">
                  <property name="rightMargin">
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="camera_1_exposure_label">
+                  <widget class="QLabel" name="camera_0_exposure_label">
                    <property name="text">
                     <string>Exposure time (us)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_camera_1_exposure">
+                  <widget class="QSpinBox" name="spinBox_camera_0_exposure">
                    <property name="buttonSymbols">
                     <enum>QAbstractSpinBox::UpDownArrows</enum>
                    </property>
@@ -107,14 +107,14 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="camera_1_gain_label">
+                  <widget class="QLabel" name="camera_0_gain_label">
                    <property name="text">
                     <string>Gain level (dB)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gain">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_0_gain">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -131,14 +131,14 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
                  <item>
-                  <widget class="QLabel" name="camera_1_gamma_label">
+                  <widget class="QLabel" name="camera_0_gamma_label">
                    <property name="text">
                     <string>Gamma correction</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gamma">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_0_gamma">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -159,14 +159,14 @@
                 </layout>
                </item>
                <item alignment="Qt::AlignBottom">
-                <widget class="QPushButton" name="pushButton_camera_1">
+                <widget class="QPushButton" name="pushButton_camera_0">
                  <property name="text">
                   <string>Start live view</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer">
+                <spacer name="horizontalSpacer_0">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -181,7 +181,7 @@
               </layout>
              </item>
              <item>
-              <widget class="QLabel" name="camera_1">
+              <widget class="QLabel" name="camera_0">
                <property name="enabled">
                 <bool>true</bool>
                </property>
@@ -219,7 +219,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_3">
+              <widget class="QLabel" name="camera_1_label">
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -235,21 +235,21 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <layout class="QHBoxLayout" name="horizontalLayout_1">
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_13">
                  <property name="rightMargin">
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_20">
+                  <widget class="QLabel" name="camera_1_exposure_label">
                    <property name="text">
                     <string>Exposure time (us)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_7">
+                  <widget class="QSpinBox" name="spinBox_camera_1_exposure">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -275,14 +275,14 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_21">
+                  <widget class="QLabel" name="camera_1_gain_label">
                    <property name="text">
                     <string>Gain level (dB)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gain">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -299,14 +299,14 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_15">
                  <item>
-                  <widget class="QLabel" name="label_22">
+                  <widget class="QLabel" name="camera_1_gamma_label">
                    <property name="text">
                     <string>Gamma correction</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_1_gamma">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -334,7 +334,7 @@
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_3">
+                <spacer name="horizontalSpacer_1">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -349,7 +349,7 @@
               </layout>
              </item>
              <item>
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="camera_1">
                <property name="minimumSize">
                 <size>
                  <width>540</width>
@@ -388,7 +388,7 @@
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
-              <widget class="QLabel" name="camera_3_label">
+              <widget class="QLabel" name="camera_2_label">
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -404,9 +404,171 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_19">
+                 <property name="rightMargin">
+                  <number>5</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="camera_2_exposure_label">
+                   <property name="text">
+                    <string>Exposure time (us)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QSpinBox" name="spinBox_camera_2_exposure">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
+                   <property name="minimum">
+                    <number>1000</number>
+                   </property>
+                   <property name="maximum">
+                    <number>1000000</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>10000</number>
+                   </property>
+                   <property name="value">
+                    <number>90000</number>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_20">
+                 <property name="rightMargin">
+                  <number>5</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="camera_2_gain_label">
+                   <property name="text">
+                    <string>Gain level (dB)</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_2_gain">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
+                   <property name="maximum">
+                    <double>25.000000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>1.830000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_21">
+                 <item>
+                  <widget class="QLabel" name="camera_2_gamma_label">
+                   <property name="text">
+                    <string>Gamma correction</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_2_gamma">
+                   <property name="keyboardTracking">
+                    <bool>false</bool>
+                   </property>
+                   <property name="minimum">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="maximum">
+                    <double>4.000000000000000</double>
+                   </property>
+                   <property name="singleStep">
+                    <double>0.100000000000000</double>
+                   </property>
+                   <property name="value">
+                    <double>0.800000000000000</double>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item alignment="Qt::AlignBottom">
+                <widget class="QPushButton" name="pushButton_camera_2">
+                 <property name="text">
+                  <string>Start live view</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="camera_2">
+               <property name="minimumSize">
+                <size>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>540</width>
+                 <height>405</height>
+                </size>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">QFrame, QLabel, QToolTip {
+    border: 2px solid #1de9b6;
+    border-radius: 4px;
+    padding: 2px;
+}</string>
+               </property>
+               <property name="frameShape">
+                <enum>QFrame::Box</enum>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="camera_3_label">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Label Camera 2</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_16">
                  <property name="rightMargin">
                   <number>5</number>
                  </property>
@@ -439,7 +601,7 @@
                 </layout>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_20">
+                <layout class="QVBoxLayout" name="verticalLayout_17">
                  <property name="rightMargin">
                   <number>5</number>
                  </property>
@@ -466,7 +628,7 @@
                 </layout>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_21">
+                <layout class="QVBoxLayout" name="verticalLayout_18">
                  <item>
                   <widget class="QLabel" name="camera_3_gamma_label">
                    <property name="text">
@@ -475,7 +637,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_3_gamma">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_2_gamma_2">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -503,7 +665,7 @@
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_5">
+                <spacer name="horizontalSpacer_3">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -528,7 +690,7 @@
                <property name="maximumSize">
                 <size>
                  <width>540</width>
-                 <height>405</height>
+                 <height>16777215</height>
                 </size>
                </property>
                <property name="styleSheet">
@@ -544,13 +706,14 @@
                <property name="text">
                 <string/>
                </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
-               </property>
               </widget>
              </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
              <item>
-              <widget class="QLabel" name="label_7">
+              <widget class="QLabel" name="camera_4_label">
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -558,7 +721,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>Label Camera 2</string>
+                <string>Label Camera 3</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
@@ -566,21 +729,21 @@
               </widget>
              </item>
              <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_16">
+                <layout class="QVBoxLayout" name="verticalLayout_22">
                  <property name="rightMargin">
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_23">
+                  <widget class="QLabel" name="camera_4_exposure_label">
                    <property name="text">
                     <string>Exposure time (us)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_10">
+                  <widget class="QSpinBox" name="spinBox_camera_4_exposure">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -601,19 +764,19 @@
                 </layout>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_17">
+                <layout class="QVBoxLayout" name="verticalLayout_23">
                  <property name="rightMargin">
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_24">
+                  <widget class="QLabel" name="camera_4_gain_label">
                    <property name="text">
                     <string>Gain level (dB)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_4_gain">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -628,16 +791,16 @@
                 </layout>
                </item>
                <item>
-                <layout class="QVBoxLayout" name="verticalLayout_18">
+                <layout class="QVBoxLayout" name="verticalLayout_24">
                  <item>
-                  <widget class="QLabel" name="label_25">
+                  <widget class="QLabel" name="camera_4_gamma_label">
                    <property name="text">
                     <string>Gamma correction</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_4_gamma">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -680,170 +843,7 @@
               </layout>
              </item>
              <item>
-              <widget class="QLabel" name="label_8">
-               <property name="minimumSize">
-                <size>
-                 <width>540</width>
-                 <height>405</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>540</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">QFrame, QLabel, QToolTip {
-    border: 2px solid #1de9b6;
-    border-radius: 4px;
-    padding: 2px;
-}</string>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::Box</enum>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
-             <item>
-              <widget class="QLabel" name="label_9">
-               <property name="font">
-                <font>
-                 <pointsize>10</pointsize>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>Label Camera 3</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_7">
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_22">
-                 <property name="rightMargin">
-                  <number>5</number>
-                 </property>
-                 <item>
-                  <widget class="QLabel" name="label_29">
-                   <property name="text">
-                    <string>Exposure time (us)</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QSpinBox" name="spinBox_16">
-                   <property name="keyboardTracking">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimum">
-                    <number>1000</number>
-                   </property>
-                   <property name="maximum">
-                    <number>1000000</number>
-                   </property>
-                   <property name="singleStep">
-                    <number>10000</number>
-                   </property>
-                   <property name="value">
-                    <number>90000</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_23">
-                 <property name="rightMargin">
-                  <number>5</number>
-                 </property>
-                 <item>
-                  <widget class="QLabel" name="label_30">
-                   <property name="text">
-                    <string>Gain level (dB)</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_17">
-                   <property name="keyboardTracking">
-                    <bool>false</bool>
-                   </property>
-                   <property name="maximum">
-                    <double>25.000000000000000</double>
-                   </property>
-                   <property name="value">
-                    <double>1.830000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_24">
-                 <item>
-                  <widget class="QLabel" name="label_31">
-                   <property name="text">
-                    <string>Gamma correction</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_18">
-                   <property name="keyboardTracking">
-                    <bool>false</bool>
-                   </property>
-                   <property name="minimum">
-                    <double>0.100000000000000</double>
-                   </property>
-                   <property name="maximum">
-                    <double>4.000000000000000</double>
-                   </property>
-                   <property name="singleStep">
-                    <double>0.100000000000000</double>
-                   </property>
-                   <property name="value">
-                    <double>0.800000000000000</double>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item alignment="Qt::AlignBottom">
-                <widget class="QPushButton" name="pushButton_camera_5">
-                 <property name="text">
-                  <string>Start live view</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_6">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_10">
+              <widget class="QLabel" name="camera_4">
                <property name="minimumSize">
                 <size>
                  <width>540</width>
@@ -875,7 +875,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_11">
+              <widget class="QLabel" name="camera_5_label">
                <property name="font">
                 <font>
                  <pointsize>10</pointsize>
@@ -898,14 +898,14 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_32">
+                  <widget class="QLabel" name="camera_5_exposure_label">
                    <property name="text">
                     <string>Exposure time (us)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QSpinBox" name="spinBox_19">
+                  <widget class="QSpinBox" name="spinBox_camera_5_exposure">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -931,14 +931,14 @@
                   <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_33">
+                  <widget class="QLabel" name="camera_5_gain_label">
                    <property name="text">
                     <string>Gain level (dB)</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_20">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_5_gain">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -955,14 +955,14 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_27">
                  <item>
-                  <widget class="QLabel" name="label_34">
+                  <widget class="QLabel" name="camera_5_gamma_label">
                    <property name="text">
                     <string>Gamma correction</string>
                    </property>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QDoubleSpinBox" name="doubleSpinBox_21">
+                  <widget class="QDoubleSpinBox" name="doubleSpinBox_camera_5_gamma">
                    <property name="keyboardTracking">
                     <bool>false</bool>
                    </property>
@@ -983,14 +983,14 @@
                 </layout>
                </item>
                <item alignment="Qt::AlignBottom">
-                <widget class="QPushButton" name="pushButton_camera_6">
+                <widget class="QPushButton" name="pushButton_camera_5">
                  <property name="text">
                   <string>Start live view</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_7">
+                <spacer name="horizontalSpacer_5">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -1005,7 +1005,7 @@
               </layout>
              </item>
              <item>
-              <widget class="QLabel" name="label_12">
+              <widget class="QLabel" name="camera_5">
                <property name="minimumSize">
                 <size>
                  <width>540</width>
@@ -1230,7 +1230,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="QLabel" name="label_2">
+               <widget class="QLabel" name="label_log">
                 <property name="text">
                  <string>Log</string>
                 </property>

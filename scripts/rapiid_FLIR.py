@@ -36,18 +36,32 @@ class customFLIR():
             print("Detected", self.device_names[id][0], "with Serial ID", self.device_names[id][1])
 
 
-        serial_1 = '21447407'
-        serial_3 = '21188171'
+        serial_0 = '21188171'
+        serial_1 = '00000000'
+        serial_2 = '22491455'
+        serial_3 = '22497398'
+        serial_4 = '22457938'
+        serial_5 = '22385074'
         
         self.cam_list = [None]
+        if serial_0 in chain(*self.device_names):
+            cam_0 = self.cam_list_raw.GetBySerial(serial_0)
+            self.cam_list.insert(0, cam_0)
         if serial_1 in chain(*self.device_names):
             cam_1 = self.cam_list_raw.GetBySerial(serial_1)
-            self.cam_list.insert(0, cam_1)
+            self.cam_list.insert(1, cam_1)
+        if serial_2 in chain(*self.device_names):
+            cam_2 = self.cam_list_raw.GetBySerial(serial_2)
+            self.cam_list.insert(2, cam_2)
         if serial_3 in chain(*self.device_names):
             cam_3 = self.cam_list_raw.GetBySerial(serial_3)
-            self.cam_list.insert(1, cam_3)
-
-        # self.cam_list = [cam_1, cam_3]      
+            self.cam_list.insert(3, cam_3)
+        if serial_4 in chain(*self.device_names):
+            cam_4 = self.cam_list_raw.GetBySerial(serial_4)
+            self.cam_list.insert(4, cam_4)
+        if serial_5 in chain(*self.device_names):
+            cam_5 = self.cam_list_raw.GetBySerial(serial_5)
+            self.cam_list.insert(5, cam_5)
 
 
         num_cameras = len(self.cam_list_raw)
@@ -62,9 +76,8 @@ class customFLIR():
             # Release system instance
             self.system.ReleaseInstance()
 
-            print('\nNo cameras attached!')
-            print('Attach cameras and restart the app.')
-            print('App closed.')
+            print('\nNo cameras attached!\nConnect cameras and restart the app.\nApp closed.')
+
             return None
 
     def initialise_camera(self, select_cam = 0):

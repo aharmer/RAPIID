@@ -1,35 +1,90 @@
 general:
   project_name: untitled_project
   camera_type: FLIR
-  camera_model: BFS-U3-200S6C-C
 camera_settings:
+  camera_0:
+    exposure_time: 90000.0
+    gain_level: 1.83
+    gamma: 0.8
   camera_1:
     exposure_time: 90000.0
     gain_level: 1.83
     gamma: 0.8
+  camera_2:
+    exposure_time: 90000.0
+    gain_level: 1.83
+    gamma: 0.8
   camera_3:
+    exposure_time: 90000.0
+    gain_level: 1.83
+    gamma: 0.8
+  camera_4:
+    exposure_time: 90000.0
+    gain_level: 1.83
+    gamma: 0.8
+  camera_5:
     exposure_time: 90000.0
     gain_level: 1.83
     gamma: 0.8
 exif_data:
-  camera_1:
-    Make: FLIR
-    Model: BFS-U3-200S6C-C
-    SerialNumber: '21447407'
-    Lens: MPZ
-    CameraSerialNumber: '21447407'
-    LensManufacturer: Computar
-    LensModel: 35.0 f / 2.2
-    FocalLength: '35.0'
-    FocalLengthIn35mmFormat: '95.0'
-  camera_3:
+  camera_0:
     Make: FLIR
     Model: BFS-U3-200S6C-C
     SerialNumber: '21188171'
     Lens: MPZ
     CameraSerialNumber: '21188171'
     LensManufacturer: Computar
-    LensModel: 35.0 f / 2.2
-    FocalLength: '35.0'
-    FocalLengthIn35mmFormat: '95.0'
+    LensModel: 75.0 f / 3.1
+    FocalLength: '75.0'
+    FocalLengthIn35mmFormat: '203.0'
+  camera_1:
+    Make: FLIR
+    Model: BFS-U3-200S6C-C
+    SerialNumber: '00000000'
+    Lens: MPZ
+    CameraSerialNumber: '00000000'
+    LensManufacturer: Computar
+    LensModel: 75.0 f / 3.1
+    FocalLength: '75.0'
+    FocalLengthIn35mmFormat: '203.0'
+  camera_2:
+    Make: FLIR
+    Model: BFS-U3-200S6M-C
+    SerialNumber: '22491455'
+    Lens: MPZ
+    CameraSerialNumber: '22491455'
+    LensManufacturer: Computar
+    LensModel: 50.0 f / 2.4
+    FocalLength: '50.0'
+    FocalLengthIn35mmFormat: '135.0'
+  camera_3:
+    Make: FLIR
+    Model: BFS-U3-200S6M-C
+    SerialNumber: '22497398'
+    Lens: MPZ
+    CameraSerialNumber: '22497398'
+    LensManufacturer: Computar
+    LensModel: 50.0 f / 2.4
+    FocalLength: '50.0'
+    FocalLengthIn35mmFormat: '135.0'
+  camera_4:
+    Make: FLIR
+    Model: BFS-U3-200S6M-C
+    SerialNumber: '22457938'
+    Lens: MPZ
+    CameraSerialNumber: '22457938'
+    LensManufacturer: Computar
+    LensModel: 50.0 f / 2.4
+    FocalLength: '50.0'
+    FocalLengthIn35mmFormat: '135.0'
+  camera_5:
+    Make: FLIR
+    Model: BFS-U3-200S6M-C
+    SerialNumber: '22385074'
+    Lens: MPZ
+    CameraSerialNumber: '22385074'
+    LensManufacturer: Computar
+    LensModel: 50.0 f / 2.4
+    FocalLength: '50.0'
+    FocalLengthIn35mmFormat: '135.0'
     
