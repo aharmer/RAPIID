@@ -47,21 +47,33 @@ class customFLIR():
         if serial_0 in chain(*self.device_names):
             cam_0 = self.cam_list_raw.GetBySerial(serial_0)
             self.cam_list.insert(0, cam_0)
+        else:
+            self.cam_list.insert(0, None)
         if serial_1 in chain(*self.device_names):
             cam_1 = self.cam_list_raw.GetBySerial(serial_1)
             self.cam_list.insert(1, cam_1)
+        else:
+            self.cam_list.insert(1, None)
         if serial_2 in chain(*self.device_names):
             cam_2 = self.cam_list_raw.GetBySerial(serial_2)
             self.cam_list.insert(2, cam_2)
+        else:
+            self.cam_list.insert(2, None)
         if serial_3 in chain(*self.device_names):
             cam_3 = self.cam_list_raw.GetBySerial(serial_3)
             self.cam_list.insert(3, cam_3)
+        else:
+            self.cam_list.insert(3, None)
         if serial_4 in chain(*self.device_names):
             cam_4 = self.cam_list_raw.GetBySerial(serial_4)
             self.cam_list.insert(4, cam_4)
+        else:
+            self.cam_list.insert(4, None)
         if serial_5 in chain(*self.device_names):
             cam_5 = self.cam_list_raw.GetBySerial(serial_5)
             self.cam_list.insert(5, cam_5)
+        else:
+            self.cam_list.insert(5, None)
 
 
         num_cameras = len(self.cam_list_raw)

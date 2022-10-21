@@ -156,7 +156,7 @@ class UI(QMainWindow):
                 msg.buttonClicked.connect(self.closeApp())
 
             # Camera 0
-            if self.FLIR.cam_list[0]:
+            if self.FLIR.cam_list[0] is not None:
                 try: 
                     self.FLIR.initialise_camera(select_cam = 0)
                     self.log_info("Dorsal camera successfully initialised.")
@@ -178,7 +178,7 @@ class UI(QMainWindow):
                 self.ui.camera_0.setText("Dorsal camera not connected.")
 
             # Camera 1
-            if self.FLIR.cam_list[1]:
+            if self.FLIR.cam_list[1] is not None:
                 try: 
                     self.FLIR.initialise_camera(select_cam = 1)
                     self.log_info("Lateral camera successfully initialised.")
@@ -200,7 +200,7 @@ class UI(QMainWindow):
                 self.ui.camera_1.setText("Lateral camera not connected.")
             
             # Camera 2
-            if self.FLIR.cam_list[2]:
+            if self.FLIR.cam_list[2] is not None:
                 try: 
                     self.FLIR.initialise_camera(select_cam = 2)
                     self.log_info("Label camera 1 successfully initialised.")
@@ -222,7 +222,7 @@ class UI(QMainWindow):
                 self.ui.camera_2.setText("Label camera 1 not connected.")
 
             # Camera 3
-            if self.FLIR.cam_list[3]:
+            if self.FLIR.cam_list[3] is not None:
                 try: 
                     self.FLIR.initialise_camera(select_cam = 3)
                     self.log_info("Label camera 2 successfully initialised.")
@@ -244,7 +244,7 @@ class UI(QMainWindow):
                 self.ui.camera_3.setText("Label camera 2 not connected.")
 
             # Camera 4
-            if self.FLIR.cam_list[4]:
+            if self.FLIR.cam_list[4] is not None:
                 try: 
                     self.FLIR.initialise_camera(select_cam = 4)
                     self.log_info("Label camera 3 successfully initialised.")
@@ -266,7 +266,7 @@ class UI(QMainWindow):
                 self.ui.camera_4.setText("Label camera 3 not connected.")
 
             # Camera 5
-            if self.FLIR.cam_list[5]:
+            if self.FLIR.cam_list[5] is not None:
                 try: 
                     self.FLIR.initialise_camera(select_cam = 5)
                     self.log_info("Label camera 4 successfully initialised.")
