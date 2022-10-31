@@ -51,7 +51,7 @@ dependencies:
     - pyyaml==6.0
     - qt-material==2.12
     - setuptools==60.10.0
-    - spinnaker-python==2.7.0.128
+    - spinnaker_python-2.7.0.128-cp38-cp38-win_amd64.whl
     - whichcraft==0.6.1
     - zipp==3.8.1
     - zope-event==4.5.0
