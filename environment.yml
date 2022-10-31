@@ -11,7 +11,6 @@ dependencies:
   - pip=22.2.2=pyhd8ed1ab_0
   - python=3.8.13=hcf16a7b_0_cpython
   - python_abi=3.8=2_cp38
-  - setuptools=63.4.2=py38haa244fe_0
   - sqlite=3.39.2=h8ffe710_0
   - tk=8.6.12=h8ffe710_0
   - ucrt=10.0.20348.0=h57928b3_0
@@ -21,25 +20,27 @@ dependencies:
   - xz=5.2.5=h62dcd97_1
   - pip:
     - altgraph==0.17.2
-    - auto-py-to-exe==2.23.0
     - bottle==0.12.23
     - bottle-websocket==0.2.9
     - cffi==1.15.1
+    - cx-freeze==6.11.1
+    - cx-logging==3.0
     - datetime==4.5
     - eel==0.14.0
     - future==0.18.2
     - gevent==21.12.0
     - gevent-websocket==0.10.1
     - greenlet==1.1.3
+    - importlib-metadata==4.12.0
     - jinja2==3.1.2
+    - lief==0.12.1
     - markupsafe==2.1.1
     - numpy==1.23.1
     - opencv-contrib-python==4.6.0.66
+    - packaging==21.3
     - pathlib==1.0.1
     - pefile==2022.5.30
     - pycparser==2.21
-    - pyinstaller==5.3
-    - pyinstaller-hooks-contrib==2022.10
     - pyparsing==3.0.9
     - pyqt5==5.15.7
     - pyqt5-qt5==5.15.2
@@ -49,8 +50,10 @@ dependencies:
     - pywin32-ctypes==0.2.0
     - pyyaml==6.0
     - qt-material==2.12
+    - setuptools==60.10.0
     - spinnaker-python==2.7.0.128
     - whichcraft==0.6.1
+    - zipp==3.8.1
     - zope-event==4.5.0
     - zope-interface==5.4.0
 prefix: C:\Users\HarmerA\Miniconda3\envs\rapiid_py38
