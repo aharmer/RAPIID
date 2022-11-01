@@ -422,17 +422,17 @@ class UI(QMainWindow):
     def popup_button(self):
         self.ui.pushButton_capture.setEnabled(False)
         if self.FLIR0_found:
-                self.capture_image(select_cam = 0, tag = "_dorsal")
-            if self.FLIR1_found:
-                self.capture_image(select_cam = 1, tag = "_lateral")
-            if self.FLIR2_found:
-                self.capture_image(select_cam = 2, tag = "_label_1")
-            if self.FLIR3_found:
-                self.capture_image(select_cam = 3, tag = "_label_2")
-            if self.FLIR4_found:
-                self.capture_image(select_cam = 4, tag = "_label_3")
-            if self.FLIR5_found:
-                self.capture_image(select_cam = 5, tag = "_label_4")
+            self.capture_image(select_cam = 0, tag = "_dorsal")
+        if self.FLIR1_found:
+            self.capture_image(select_cam = 1, tag = "_lateral")
+        if self.FLIR2_found:
+           self.capture_image(select_cam = 2, tag = "_label_1")
+        if self.FLIR3_found:
+            self.capture_image(select_cam = 3, tag = "_label_2")
+        if self.FLIR4_found:
+            self.capture_image(select_cam = 4, tag = "_label_3")
+        if self.FLIR5_found:
+            self.capture_image(select_cam = 5, tag = "_label_4")
         self.ui.pushButton_capture.setEnabled(True)
 
     def capture_image(self, select_cam, tag):
