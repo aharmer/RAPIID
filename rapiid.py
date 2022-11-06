@@ -375,7 +375,8 @@ class UI(QMainWindow):
         value = spin_id.value()
         if value is not None:
             self.log_info("Exposure time set to " + str(value) + " [us]")
-            self.FLIR.configure_exposure(select_cam, exposure = float(value))
+            # self.FLIR.configure_exposure(select_cam, exposure = float(value))
+            self.FLIR.set_exposure(select_cam, exposure = float(value))
 
     def set_gain_manual(self, lab_id, select_cam, dspin_id):
         lab_id.setEnabled(True)

@@ -111,48 +111,55 @@ class customFLIR():
 
         self.set_gain(select_cam, gain = 1.83)
         self.set_gamma(select_cam, gamma = 0.8)
-        self.configure_exposure(select_cam, exposure = 90000)
+        # self.configure_exposure(select_cam, exposure = 90000)
+        self.set_exposure(select_cam, exposure = 150000)
 
         # Begin Acquisition of image stream
         self.cam.BeginAcquisition()
 
-    def configure_exposure(self, select_cam = 0, exposure = 100000):
-        """
-         This function configures a custom exposure time. Automatic exposure is turned
-         off in order to allow for the customization, and then the custom setting is
-         applied.
+    # def configure_exposure(self, select_cam = 0, exposure = 100000):
+    #     """
+    #      This function configures a custom exposure time. Automatic exposure is turned
+    #      off in order to allow for the customization, and then the custom setting is
+    #      applied.
 
-         :param cam: Camera to configure exposure for.
-         :type cam: CameraPtr
-         :return: True if successful, False otherwise.
-         :rtype: bool
-        """
+    #      :param cam: Camera to configure exposure for.
+    #      :type cam: CameraPtr
+    #      :return: True if successful, False otherwise.
+    #      :rtype: bool
+    #     """
 
+    #     self.cam = self.cam_list[select_cam]
+
+    #     try:
+    #         result = True
+
+    #         if self.cam.ExposureAuto.GetAccessMode() != PySpin.RW:
+    #             print('Unable to disable automatic exposure. Aborting...')
+    #             return False
+
+    #         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
+
+    #         if self.cam.ExposureTime.GetAccessMode() != PySpin.RW:
+    #             print('Unable to set exposure time. Aborting...')
+    #             return False
+
+    #         # Ensure desired exposure time does not exceed the maximum
+    #         exposure = min(self.cam.ExposureTime.GetMax(), exposure)
+    #         self.cam.ExposureTime.SetValue(exposure)
+
+
+    #     except PySpin.SpinnakerException as ex:
+    #         print('Error: %s' % ex)
+    #         result = False
+
+    #     return result
+
+    def set_exposure(self, select_cam = 0, exposure = 150000):
         self.cam = self.cam_list[select_cam]
-
-        try:
-            result = True
-
-            if self.cam.ExposureAuto.GetAccessMode() != PySpin.RW:
-                print('Unable to disable automatic exposure. Aborting...')
-                return False
-
-            self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-
-            if self.cam.ExposureTime.GetAccessMode() != PySpin.RW:
-                print('Unable to set exposure time. Aborting...')
-                return False
-
-            # Ensure desired exposure time does not exceed the maximum
-            exposure = min(self.cam.ExposureTime.GetMax(), exposure)
-            self.cam.ExposureTime.SetValue(exposure)
-
-
-        except PySpin.SpinnakerException as ex:
-            print('Error: %s' % ex)
-            result = False
-
-        return result
+        self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
+        exposure = min(self.cam.ExposureTime.GetMax(), exposure)
+        self.cam.ExposureTime.SetValue(exposure)
 
     def set_gain(self, select_cam = 0, gain = 1.83):
         self.cam = self.cam_list[select_cam]
