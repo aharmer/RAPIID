@@ -1,2 +1,2 @@
 # RAPIID
-Rapid Angled Pinned Insect Imaging Device
+Round Angle Pinned Insect Imaging Device
