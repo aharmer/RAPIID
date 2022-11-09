@@ -3,27 +3,27 @@ general:
   camera_type: FLIR
 camera_settings:
   camera_0:
-    exposure_time: 90000.0
+    exposure_time: 150000.0
     gain_level: 1.83
     gamma: 0.8
   camera_1:
-    exposure_time: 90000.0
+    exposure_time: 150000.0
     gain_level: 1.83
     gamma: 0.8
   camera_2:
-    exposure_time: 90000.0
+    exposure_time: 150000.0
     gain_level: 1.83
     gamma: 0.8
   camera_3:
-    exposure_time: 90000.0
+    exposure_time: 150000.0
     gain_level: 1.83
     gamma: 0.8
   camera_4:
-    exposure_time: 90000.0
+    exposure_time: 150000.0
     gain_level: 1.83
     gamma: 0.8
   camera_5:
-    exposure_time: 90000.0
+    exposure_time: 150000.0
     gain_level: 1.83
     gamma: 0.8
 exif_data:

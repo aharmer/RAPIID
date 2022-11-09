@@ -375,7 +375,6 @@ class UI(QMainWindow):
         value = spin_id.value()
         if value is not None:
             self.log_info("Exposure time set to " + str(value) + " [us]")
-            # self.FLIR.configure_exposure(select_cam, exposure = float(value))
             self.FLIR.set_exposure(select_cam, exposure = float(value))
 
     def set_gain_manual(self, lab_id, select_cam, dspin_id):
@@ -427,7 +426,7 @@ class UI(QMainWindow):
         if self.FLIR1_found:
             self.capture_image(select_cam = 1, tag = "_lateral")
         if self.FLIR2_found:
-           self.capture_image(select_cam = 2, tag = "_label_1")
+            self.capture_image(select_cam = 2, tag = "_label_1")
         if self.FLIR3_found:
             self.capture_image(select_cam = 3, tag = "_label_2")
         if self.FLIR4_found:
