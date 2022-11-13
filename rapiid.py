@@ -11,6 +11,7 @@ import scripts.ymlRW as ymlRW
 import cv2
 from qt_material import apply_stylesheet
 
+lock = QMutex()
 
 class WorkerSignals(QtCore.QObject):
     '''
@@ -375,7 +376,8 @@ class UI(QMainWindow):
         value = spin_id.value()
         if value is not None:
             self.log_info("Exposure time set to " + str(value) + " [us]")
-            self.FLIR.set_exposure(select_cam, exposure = float(value))
+            with QMutexLocker(lock):
+                self.FLIR.set_exposure(select_cam, exposure = float(value))
 
     def set_gain_manual(self, lab_id, select_cam, dspin_id):
         lab_id.setEnabled(True)

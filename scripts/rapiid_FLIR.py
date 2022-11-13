@@ -111,8 +111,7 @@ class customFLIR():
 
         self.set_gain(select_cam, gain = 1.83)
         self.set_gamma(select_cam, gamma = 0.8)
-        # self.configure_exposure(select_cam, exposure = 90000)
-        self.set_exposure(select_cam, exposure = 150000)
+        self.configure_exposure(select_cam, exposure = 90000)
 
         # Begin Acquisition of image stream
         self.cam.BeginAcquisition()
