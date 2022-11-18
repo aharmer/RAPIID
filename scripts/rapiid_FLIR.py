@@ -116,43 +116,6 @@ class customFLIR():
         # Begin Acquisition of image stream
         self.cam.BeginAcquisition()
 
-    # def configure_exposure(self, select_cam = 0, exposure = 100000):
-    #     """
-    #      This function configures a custom exposure time. Automatic exposure is turned
-    #      off in order to allow for the customization, and then the custom setting is
-    #      applied.
-
-    #      :param cam: Camera to configure exposure for.
-    #      :type cam: CameraPtr
-    #      :return: True if successful, False otherwise.
-    #      :rtype: bool
-    #     """
-
-    #     self.cam = self.cam_list[select_cam]
-
-    #     try:
-    #         result = True
-
-    #         if self.cam.ExposureAuto.GetAccessMode() != PySpin.RW:
-    #             print('Unable to disable automatic exposure. Aborting...')
-    #             return False
-
-    #         self.cam.ExposureAuto.SetValue(PySpin.ExposureAuto_Off)
-
-    #         if self.cam.ExposureTime.GetAccessMode() != PySpin.RW:
-    #             print('Unable to set exposure time. Aborting...')
-    #             return False
-
-    #         # Ensure desired exposure time does not exceed the maximum
-    #         exposure = min(self.cam.ExposureTime.GetMax(), exposure)
-    #         self.cam.ExposureTime.SetValue(exposure)
-
-
-    #     except PySpin.SpinnakerException as ex:
-    #         print('Error: %s' % ex)
-    #         result = False
-
-    #     return result
 
     def set_exposure(self, select_cam = 0, exposure = 150000):
         self.cam = self.cam_list[select_cam]
@@ -170,15 +133,6 @@ class customFLIR():
         self.cam.Gamma.SetValue(gamma)
 
     def live_view(self, select_cam = 0):
-        """
-        This function acquires and saves 10 images from a device; please see
-        Acquisition example for more in-depth comments on the acquisition of images.
-
-        :param cam: Camera to acquire images from.
-        :type cam: CameraPtr
-        :return: True if successful, False otherwise.
-        :rtype: bool
-        """
         self.cam = self.cam_list[select_cam]
         resized = None
 
