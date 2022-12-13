@@ -21,7 +21,7 @@ if sys.platform == "win32":
 setup(
     name = 'RAPIID',
     version = '1.0',
-    description = 'Rapid Angled Pinned Insect Imaging Device',
+    description = 'Round Angle Pinned Insect Imaging Device',
     author = 'A.M.T. Harmer',
     author_email = 'harmera@landcareresearch.co.nz',
     options = {'build_exe': {
@@ -32,7 +32,7 @@ setup(
         }, 
     executables = [Executable('rapiid.py', 
     base = base, # "Console", base, # None
-    icon='images/RAPIID_icon.ico', 
+    icon ='images/RAPIID_icon.ico', 
     shortcutName = shortcutName, 
     shortcutDir = shortcutDir)]
 )
