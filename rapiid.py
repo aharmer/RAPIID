@@ -60,7 +60,7 @@ class Worker(QtCore.QRunnable):
         self.kwargs = kwargs
         self.signals = WorkerSignals()
 
-        # Add the callback to our kwargs
+        # Add the callback to kwargs
         self.kwargs['progress_callback'] = self.signals.progress
 
     @QtCore.pyqtSlot()
@@ -164,7 +164,6 @@ class UI(QMainWindow):
                     self.camera_type = "FLIR"
                     self.camera_0_model = 'Blackfly S BFS-U3-200S6C'
                     self.FLIR0_found = True
-                    # self.FLIR_image_queue = []
                 except IndexError:
                     message0 = "Dorsal camera not initialised!"
                     self.log_info(message0)
@@ -186,7 +185,6 @@ class UI(QMainWindow):
                     self.camera_type = "FLIR"
                     self.camera_1_model = 'Blackfly S BFS-U3-200S6C'
                     self.FLIR1_found = True
-                    # self.FLIR_image_queue = []
                 except IndexError:
                     message1 = "Lateral camera not initialised!"
                     self.log_info(message1)
@@ -208,7 +206,6 @@ class UI(QMainWindow):
                     self.camera_type = "FLIR"
                     self.camera_2_model = 'Blackfly S BFS-U3-200S6M'
                     self.FLIR2_found = True
-                    # self.FLIR_image_queue = []
                 except IndexError:
                     message2 = "Label camera 1 not initialised!"
                     self.log_info(message2)
@@ -230,7 +227,6 @@ class UI(QMainWindow):
                     self.camera_type = "FLIR"
                     self.camera_3_model = 'Blackfly S BFS-U3-200S6M'
                     self.FLIR3_found = True
-                    # self.FLIR_image_queue = []
                 except IndexError:
                     message3 = "Label camera 2 not initialised!"
                     self.log_info(message2)
@@ -252,7 +248,6 @@ class UI(QMainWindow):
                     self.camera_type = "FLIR"
                     self.camera_4_model = 'Blackfly S BFS-U3-200S6M'
                     self.FLIR4_found = True
-                    # self.FLIR_image_queue = []
                 except IndexError:
                     message4 = "Label camera 3 not initialised!"
                     self.log_info(message4)
@@ -274,7 +269,6 @@ class UI(QMainWindow):
                     self.camera_type = "FLIR"
                     self.camera_5_model = 'Blackfly S BFS-U3-200S6M'
                     self.FLIR5_found = True
-                    # self.FLIR_image_queue = []
                 except IndexError:
                     message5 = "Label camera 4 not initialised!"
                     self.log_info(message5)
@@ -546,7 +540,7 @@ class UI(QMainWindow):
 
     def get_default_values(self):
         # WARNING! THESE SETTINGS ARE SPECIFIC TO THE CAMERA USED DURING DEVELOPMENT
-        # OF THE SCANNER AND WILL LIKELY NOT APPLY TO YOUR SETUP
+        # AND WILL LIKELY NOT APPLY TO YOUR SETUP
         config = {'general': {'project_name': 'untitled_project'},
                        'exif_data': {'camera_0': {'Make': 'FLIR',
                                                   'Model': 'BFS-U3-200S6C-C',
