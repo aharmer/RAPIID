@@ -30,9 +30,9 @@ exif_data:
   camera_0:
     Make: FLIR
     Model: BFS-U3-200S6C-C
-    SerialNumber: '21188171'
+    SerialNumber: '22497486'
     Lens: MPZ
-    CameraSerialNumber: '21188171'
+    CameraSerialNumber: '22497486'
     LensManufacturer: Computar
     LensModel: 75.0 f / 3.1
     FocalLength: '75.0'
@@ -40,9 +40,9 @@ exif_data:
   camera_1:
     Make: FLIR
     Model: BFS-U3-200S6C-C
-    SerialNumber: '00000000'
+    SerialNumber: '22444751'
     Lens: MPZ
-    CameraSerialNumber: '00000000'
+    CameraSerialNumber: '22444751'
     LensManufacturer: Computar
     LensModel: 75.0 f / 3.1
     FocalLength: '75.0'

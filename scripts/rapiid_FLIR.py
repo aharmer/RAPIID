@@ -36,8 +36,8 @@ class customFLIR():
             print("Detected", self.device_names[id][0], "with Serial ID", self.device_names[id][1])
 
 
-        serial_0 = '21188171'
-        serial_1 = '00000000'
+        serial_0 = '22497486'
+        serial_1 = '22444751'
         serial_2 = '22491455'
         serial_3 = '22497398'
         serial_4 = '22457938'
