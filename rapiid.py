@@ -158,7 +158,7 @@ class UI(QMainWindow):
             # Camera 0
             if self.FLIR.cam_list[0] is not None:
                 try: 
-                    self.FLIR.initialise_camera(select_cam = 0)
+                    self.FLIR.initialise_camera(select_cam = 0, exposure = 300000)
                     self.log_info("Dorsal camera successfully initialised.")
                     self.ui.camera_0.setText("Dorsal camera successfully initialised.")
                     self.camera_type = "FLIR"
@@ -179,7 +179,7 @@ class UI(QMainWindow):
             # Camera 1
             if self.FLIR.cam_list[1] is not None:
                 try: 
-                    self.FLIR.initialise_camera(select_cam = 1)
+                    self.FLIR.initialise_camera(select_cam = 1, exposure = 300000)
                     self.log_info("Lateral camera successfully initialised.")
                     self.ui.camera_1.setText("Lateral camera successfully initialised.")
                     self.camera_type = "FLIR"
@@ -294,7 +294,7 @@ class UI(QMainWindow):
             self.disable_inputs(cam_id = 5)
 
         # Select output folder
-        self.output_location = str(Path.cwd())
+        self.output_location = str(Path.home())
         self.update_output_location()
         self.ui.pushButton_outputFolder.pressed.connect(self.set_output_location)
         self.output_location_folder = Path(self.output_location)
@@ -456,6 +456,10 @@ class UI(QMainWindow):
                 QtWidgets.QMessageBox.critical(self, "Failed to load " + str(config_location.name), "The selected config file was generated for a different camera type!")
                 return
 
+            # output path
+            self.output_location = config["general"]["output_folder"]
+            self.ui.display_path.setText(self.output_location)
+
             # project name
             self.ui.lineEdit_project.setText(config["general"]["project_name"])
 
@@ -499,6 +503,7 @@ class UI(QMainWindow):
             self.log_info("Created folder: " + str(self.ui.lineEdit_project.text()))
 
         config = {'general': {'project_name': self.ui.lineEdit_project.text(),
+                              'output_folder': self.output_location,
                               'camera_type': self.camera_type,
                               'camera_0_model': self.camera_0_model,
                               'camera_1_model': self.camera_1_model,

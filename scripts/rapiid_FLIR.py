@@ -36,7 +36,7 @@ class customFLIR():
             print("Detected", self.device_names[id][0], "with Serial ID", self.device_names[id][1])
 
 
-        serial_0 = '22497486'
+        serial_0 = '21188171'
         serial_1 = '22444751'
         serial_2 = '22491455'
         serial_3 = '22497398'
@@ -92,7 +92,7 @@ class customFLIR():
 
             return None
 
-    def initialise_camera(self, select_cam = 0):
+    def initialise_camera(self, select_cam = 0, exposure = 150000):
         # overwrite the selected cam at initialisation if desired
         self.cam = self.cam_list[select_cam]
         # initialise camera, apply settings and begin acquisition
@@ -109,9 +109,9 @@ class customFLIR():
         self.cam.AcquisitionMode.SetValue(PySpin.AcquisitionMode_Continuous)
         print('Acquisition mode set to continuous...')
 
-        self.set_gain(select_cam, gain = 1.83)
+        self.set_gain(select_cam, gain = 5)
         self.set_gamma(select_cam, gamma = 0.8)
-        self.set_exposure(select_cam, exposure = 150000)
+        self.set_exposure(select_cam, exposure = exposure)
 
         # Begin Acquisition of image stream
         self.cam.BeginAcquisition()
@@ -123,7 +123,7 @@ class customFLIR():
         exposure = min(self.cam.ExposureTime.GetMax(), exposure)
         self.cam.ExposureTime.SetValue(exposure)
 
-    def set_gain(self, select_cam = 0, gain = 1.83):
+    def set_gain(self, select_cam = 0, gain = 5):
         self.cam = self.cam_list[select_cam]
         self.cam.GainAuto.SetValue(PySpin.GainAuto_Off)
         self.cam.Gain.SetValue(gain)
