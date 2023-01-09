@@ -153,7 +153,7 @@ class customFLIR():
                     # convert from FLIR format to OpenCV np array
                     img_conv = image_result.Convert(PySpin.PixelFormat_BGR8, PySpin.HQ_LINEAR)
 
-                    scale_percent = 15  # percent of original size
+                    scale_percent = 75  # percent of original size
                     width = int(width * scale_percent / 100)
                     height = int(height * scale_percent / 100)
                     dim = (width, height)
