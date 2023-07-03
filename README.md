@@ -1,5 +1,5 @@
 # RAPIID
-Round Angle Pinned Insect Imaging Device
+RAked Pinned Insect Imaging Device
 
 
 ### Description
