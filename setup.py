@@ -21,7 +21,7 @@ if sys.platform == "win32":
 setup(
     name = 'RAPIID',
     version = '1.0',
-    description = 'Round Angle Pinned Insect Imaging Device',
+    description = 'Raked Pinned Insect Imaging Device',
     author = 'A.M.T. Harmer',
     author_email = 'harmera@landcareresearch.co.nz',
     options = {'build_exe': {

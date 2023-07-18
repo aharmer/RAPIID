@@ -17,7 +17,6 @@ class customFLIR():
         print('Spinnaker library version: %d.%d.%d.%d' % (version.major, version.minor, version.type, version.build))
 
         # Retrieve list of cameras from the system
-
         self.cam_list_raw = self.system.GetCameras()
         
         # get all serial numbers of connected and support FLIR cameras
