@@ -1,6 +1,7 @@
 import sys
 import os
 import csv
+import re
 import traceback
 from pathlib import Path
 import datetime
@@ -309,13 +310,24 @@ class FLIRCamera:
             print(f"Error during cleanup: {ex}")
 
 
+def slugify(text):
+    """Reduce a camera name to a filename-safe token.
+
+    Runs of anything other than letters and digits collapse to a single
+    underscore, so "Whole specimen (dorsal)" becomes "whole_specimen_dorsal".
+    Returns an empty string if nothing usable remains.
+    """
+    return re.sub(r'[^A-Za-z0-9]+', '_', text).strip('_').lower()
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Metadata helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
 class ExifManager:
     @staticmethod
-    def add_exif_to_image(image_path, creator, taxon, accession, device_info, institution=""):
+    def add_exif_to_image(image_path, creator, taxon, accession, device_info,
+                          institution="", description="Specimen label"):
         if not EXIF_AVAILABLE:
             return False, "EXIF embedding skipped (PIL/piexif not installed)"
         try:
@@ -329,7 +341,8 @@ class ExifManager:
                     piexif.ImageIFD.Make: b"RAPIID",
                     piexif.ImageIFD.Model: device_info.encode(),
                     piexif.ImageIFD.Software: b"RAPIID v4.0.1",
-                    piexif.ImageIFD.ImageDescription: f"Specimen: {taxon} - {accession} - LABEL".encode(),
+                    piexif.ImageIFD.ImageDescription:
+                        f"Specimen: {taxon} - {accession} - {description.upper()}".encode(),
                 },
                 "Exif": {
                     piexif.ExifIFD.DateTimeOriginal: now.strftime("%Y:%m:%d %H:%M:%S").encode(),
@@ -349,7 +362,8 @@ class ExifManager:
             return False, f"Failed to add EXIF data: {e}"
 
     @staticmethod
-    def get_csv_data(creator, taxon, accession, file_format, device_info="", tag="_label", institution=""):
+    def get_csv_data(creator, taxon, accession, file_format, device_info="", tag="_label",
+                     institution="", description="Specimen label"):
         now = datetime.datetime.now()
         rights = institution if institution else "Manaaki Whenua Landcare Research"
         return {
@@ -362,8 +376,8 @@ class ExifManager:
             'creator': creator,
             'date_captured': now.strftime("%Y-%m-%d %H:%M:%S"),
             'capture_device': device_info or "RAPIID",
-            'caption': f"{accession} - Specimen label",
-            'title': f"{taxon} - {accession} - Specimen label",
+            'caption': f"{accession} - {description}",
+            'title': f"{taxon} - {accession} - {description}",
         }
 
 
@@ -384,17 +398,45 @@ class FileManager:
 
     @staticmethod
     def create_or_update_csv(output_location, taxon, csv_data):
+        """Add a capture row, replacing any existing row for the same image.
+
+        Re-capturing an accession overwrites the image file, so the CSV must
+        overwrite the matching row rather than append a second one. Rows are
+        keyed on image_filename, which is unique per image within a taxon.
+
+        The file is rewritten via a temporary file and an atomic replace, so an
+        interrupted write cannot leave a half-written CSV behind.
+        """
         taxon_folder = Path(output_location).joinpath(taxon)
         csv_path = taxon_folder.joinpath(f"{taxon}_captures.csv")
-        file_exists = csv_path.exists()
         try:
             taxon_folder.mkdir(parents=True, exist_ok=True)
-            with open(csv_path, 'a', newline='', encoding='utf-8') as csvfile:
+
+            rows = []
+            if csv_path.exists():
+                with open(csv_path, newline='', encoding='utf-8') as csvfile:
+                    rows = list(csv.DictReader(csvfile))
+
+            key = csv_data['image_filename']
+            replaced = False
+            for i, row in enumerate(rows):
+                if row.get('image_filename') == key:
+                    rows[i] = csv_data
+                    replaced = True
+                    break
+            if not replaced:
+                rows.append(csv_data)
+
+            tmp_path = csv_path.parent.joinpath(csv_path.name + '.tmp')
+            with open(tmp_path, 'w', newline='', encoding='utf-8') as csvfile:
                 writer = csv.DictWriter(csvfile, fieldnames=FileManager.CSV_HEADERS)
-                if not file_exists:
-                    writer.writeheader()
-                writer.writerow(csv_data)
-            return True, f"Saved capture metadata to {csv_path.name}"
+                writer.writeheader()
+                for row in rows:
+                    writer.writerow({h: row.get(h, '') for h in FileManager.CSV_HEADERS})
+            os.replace(tmp_path, csv_path)
+
+            verb = "Updated" if replaced else "Saved"
+            return True, f"{verb} capture metadata in {csv_path.name}"
         except Exception as e:
             return False, f"Failed to write CSV: {e}"
 
@@ -468,6 +510,11 @@ class LabelCameraSlot(QWidget):
         self.flir_count = flir_count
         self.frame_signal = frame_signal
 
+        # Camera name. Defaults to "Label camera N" and is renumbered when
+        # slots are removed; once the user edits it, the chosen name sticks.
+        self.default_name = f"Label camera {slot_index + 1}"
+        self.name_is_custom = False
+
         # Each slot owns its own FLIRCamera instance so multiple slots can
         # use different physical FLIR cameras independently.
         self.flir_camera = None
@@ -487,6 +534,51 @@ class LabelCameraSlot(QWidget):
 
         self._build_ui(webcams, flir_count)
 
+    # ── Camera naming ──────────────────────────────────────────────────────────
+
+    def _on_name_edited(self, text):
+        """Track whether the name has been changed away from the default.
+
+        textEdited fires only for user edits, so programmatic renumbering does
+        not mark a slot as custom. Typing the default name back in clears the
+        custom flag again.
+        """
+        self.name_is_custom = text.strip() != self.default_name
+
+    def _on_name_committed(self):
+        """Fall back to the default name if the field is left empty."""
+        if not self.name_edit.text().strip():
+            self.name_edit.setText(self.default_name)
+            self.name_is_custom = False
+
+    def camera_name(self):
+        """The camera's display name, never empty."""
+        return self.name_edit.text().strip() or self.default_name
+
+    def set_slot_index(self, index):
+        """Re-number this slot, preserving a user-chosen name."""
+        self.slot_index = index
+        self.default_name = f"Label camera {index + 1}"
+        if not self.name_is_custom:
+            self.name_edit.setText(self.default_name)
+
+    def filename_tag(self, multi):
+        """Filename suffix for images from this camera.
+
+        Default-named cameras keep the original scheme ("_label", or
+        "_label_N" when there is more than one) so existing workflows and
+        filenames are unchanged. A renamed camera contributes its own name.
+        """
+        if self.name_is_custom:
+            slug = slugify(self.camera_name())
+            if slug:
+                return f"_{slug}"
+        return f"_label_{self.slot_index + 1}" if multi else "_label"
+
+    def image_description(self):
+        """Human-readable description of what this camera captures."""
+        return self.camera_name() if self.name_is_custom else "Specimen label"
+
     # ── UI construction ────────────────────────────────────────────────────────
 
     def _build_ui(self, webcams, flir_count):
@@ -498,17 +590,29 @@ class LabelCameraSlot(QWidget):
         # to fill its cell uniformly across both columns.
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
-        # Header row: bold title + Remove button
+        # Header row: editable camera name + Remove button.
+        # The name is editable so a camera used for something other than labels
+        # (e.g. whole specimens) can be identified in the filename and metadata.
         header_row = QHBoxLayout()
-        self.header_label = QLabel(f"Label camera {self.slot_index + 1}")
         bold = QtGui.QFont()
         bold.setFamilies(["Segoe UI", "system-ui", "ui-sans-serif", "sans-serif"])
         bold.setBold(True)
         bold.setPointSize(10)
-        self.header_label.setFont(bold)
+        self.name_edit = QLineEdit(self.default_name)
+        self.name_edit.setFont(bold)
+        self.name_edit.setMaxLength(60)
+        self.name_edit.setMinimumWidth(190)
+        self.name_edit.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        self.name_edit.setToolTip(
+            "Camera name. Rename this (e.g. \"Specimen\") to record what the "
+            "camera captures —\nthe name is used in the image filename and in "
+            "the image metadata."
+        )
+        self.name_edit.textEdited.connect(self._on_name_edited)
+        self.name_edit.editingFinished.connect(self._on_name_committed)
         self.remove_btn = QPushButton("× Remove")
         self.remove_btn.setFixedWidth(110)
-        header_row.addWidget(self.header_label)
+        header_row.addWidget(self.name_edit)
         header_row.addStretch()
         header_row.addWidget(self.remove_btn)
         layout.addLayout(header_row)
@@ -1101,10 +1205,9 @@ class UI(QMainWindow):
             slot.deleteLater()
             self.label_slots.remove(slot)
 
-            # Re-number remaining slots
+            # Re-number remaining slots (custom names are preserved)
             for i, s in enumerate(self.label_slots):
-                s.slot_index = i
-                s.header_label.setText(f"Label camera {i + 1}")
+                s.set_slot_index(i)
 
             self._retile_grid()
             self._update_remove_buttons()
@@ -1495,7 +1598,7 @@ class UI(QMainWindow):
         try:
             if not slot.label_webcamView:
                 if not slot.selected_camera:
-                    self.log_info(f"Label camera {slot.slot_index + 1}: please select a camera first.")
+                    self.log_info(f"{slot.camera_name()}: please select a camera first.")
                     return
 
                 barcode_conflict = (
@@ -1508,7 +1611,7 @@ class UI(QMainWindow):
 
                 slot.start_btn.setText("Stop live view")
                 slot.label_webcamView = True
-                self.log_info(f"Started label camera {slot.slot_index + 1} live view.")
+                self.log_info(f"Started {slot.camera_name()} live view.")
                 self._refresh_camera_availability()
 
                 if slot.label_camera_type == 'FLIR' and slot.flir_camera:
@@ -1523,14 +1626,14 @@ class UI(QMainWindow):
             else:
                 slot.start_btn.setText("Start live view")
                 slot.label_webcamView = False
-                self.log_info(f"Ended label camera {slot.slot_index + 1} live view.")
+                self.log_info(f"Ended {slot.camera_name()} live view.")
                 self._refresh_camera_availability()
                 if slot.label_camera_type == 'FLIR' and slot.flir_camera:
                     slot.flir_camera.stop_acquisition()
 
         except Exception as e:
             print(f"Error in begin_label_camera (slot {slot.slot_index}): {e}")
-            self.log_info(f"Error with label camera {slot.slot_index + 1}: {e}")
+            self.log_info(f"Error with {slot.camera_name()}: {e}")
 
     def update_label_camera(self, slot, progress_callback):
         """Worker: stream frames for a single LabelCameraSlot.
@@ -1659,11 +1762,18 @@ class UI(QMainWindow):
                 capture_dlg.show()
                 QApplication.processEvents()
 
+            # Two cameras given the same name would write to the same file, so
+            # any duplicate tag gets its slot number appended to keep it unique.
+            base_tags = [slot.filename_tag(n > 1) for slot in self.label_slots]
+            tags = [
+                f"{tag}_{slot.slot_index + 1}" if base_tags.count(tag) > 1 else tag
+                for tag, slot in zip(base_tags, self.label_slots)
+            ]
+
             for i, slot in enumerate(self.label_slots):
-                tag = f"_label_{slot.slot_index + 1}" if n > 1 else "_label"
                 if n > 1:
                     capture_dlg.set_step(i + 1, f"Saving image {i + 1} of {n}…")
-                self.capture_label_camera(slot, tag)
+                self.capture_label_camera(slot, tags[i])
 
             if n > 1:
                 capture_dlg.set_step(n, "Done!")
@@ -1690,24 +1800,26 @@ class UI(QMainWindow):
 
             frame_to_save = slot.get_frame_for_capture()
             if frame_to_save is None:
-                self.log_info(f"Camera {slot.slot_index + 1}: no frame available!")
+                self.log_info(f"{slot.camera_name()}: no frame available!")
                 self._flash_capture_feedback(success=False)
                 return
 
             cv2.imwrite(file_name, frame_to_save)
-            self.log_info(f"Camera {slot.slot_index + 1}: {os.path.basename(file_name)} saved.")
+            self.log_info(f"{slot.camera_name()}: {os.path.basename(file_name)} saved.")
             self._flash_capture_feedback(success=True)
 
             device_info = slot.get_device_info()
+            description = slot.image_description()
 
             _, exif_msg = ExifManager.add_exif_to_image(
-                file_name, creator, taxon, accession, device_info, institution
+                file_name, creator, taxon, accession, device_info, institution,
+                description=description
             )
             self.log_info(exif_msg)
 
             csv_data = ExifManager.get_csv_data(
                 creator, taxon, accession, self.file_format, device_info,
-                tag=tag, institution=institution
+                tag=tag, institution=institution, description=description
             )
             _, csv_msg = FileManager.create_or_update_csv(
                 self.output_location, taxon, csv_data
@@ -1716,7 +1828,7 @@ class UI(QMainWindow):
 
         except Exception as e:
             print(f"Error capturing from slot {slot.slot_index}: {e}")
-            self.log_info(f"Camera {slot.slot_index + 1}: capture failed! {e}")
+            self.log_info(f"{slot.camera_name()}: capture failed! {e}")
             self._flash_capture_feedback(success=False)
 
     def create_output_folders(self):
@@ -1789,6 +1901,7 @@ class UI(QMainWindow):
             camera_settings = {}
             for i, slot in enumerate(self.label_slots):
                 camera_settings[f'camera_{i}'] = {
+                    'camera_name': slot.camera_name(),
                     'camera_type': slot.label_camera_type,
                     'selected_camera': slot.selected_camera,
                     'exposure_ms': slot.exposure_spinbox.value(),

@@ -152,6 +152,15 @@ On Windows, OpenCV uses the DirectShow backend (`CAP_DSHOW`) for all webcam oper
 4. **Start label camera(s)** — select each label camera, click *Start live view*; the live view appears in the grid
 5. **Capture** — click *Capture image* (or press `Alt+C`); images are saved, EXIF is embedded, and a CSV row is appended
 6. **Add cameras** — click *+ Add label camera* to add up to 4 cameras; the grid switches to 2-column layout automatically
+7. **Rename a camera (optional)** — each camera's name is editable in its header. Cameras are named *Label camera 1*, *2* … by default; rename one (e.g. to *Specimen*) if it captures something other than labels
+
+### Renaming a camera
+
+A camera's name determines how its images are identified. Leaving the default name preserves the existing `_label` / `_label_N` filenames, so established workflows are unaffected.
+
+Renaming a camera to *Specimen* instead produces `<accession>_specimen.jpg`, and records "Specimen" in the image's EXIF description and in the `caption` and `title` CSV columns — so a specimen image is distinguishable from a label image without opening it.
+
+Names are reduced to a filename-safe form: *Whole specimen (dorsal)* becomes `_whole_specimen_dorsal`. If two cameras are given the same name, the camera number is appended so one capture cannot overwrite another.
 
 ---
 
@@ -163,6 +172,9 @@ For each capture session the following are created under `<output_folder>/<taxon
 |---|---|
 | `<accession>_label.jpg` | Captured image (single camera) |
 | `<accession>_label_1.jpg`, `_label_2.jpg` … | Per-camera images (multi-camera) |
+| `<accession>_specimen.jpg` | Image from a camera renamed to "Specimen" (see below) |
+
+Re-capturing an accession overwrites the image files and **updates** the matching CSV rows in place, rather than adding duplicates.
 
 A shared CSV log is written to `<output_folder>/<taxon_name>/<taxon_name>_captures.csv` with the following columns:
 

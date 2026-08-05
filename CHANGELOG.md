@@ -2,6 +2,30 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Added
+
+- **Editable camera names.** Each camera's name can now be edited in its header.
+  Cameras default to "Label camera 1", "2" … as before; renaming one (e.g. to
+  "Specimen") marks what it captures. The name flows into the image filename
+  (`<accession>_specimen.jpg`), the EXIF description, and the `caption` and
+  `title` CSV columns, so a specimen image is distinguishable from a label
+  image. Default-named cameras keep the existing `_label` / `_label_N`
+  filenames, so existing workflows are unchanged. Names are reduced to a
+  filename-safe form, and duplicate names have the camera number appended so
+  one capture cannot overwrite another. Custom names survive renumbering when
+  another camera is removed, and are saved to the config file.
+
+### Fixed
+
+- **Re-capturing an accession added duplicate CSV rows.** Overwriting the images
+  for an existing accession appended a second set of rows to the taxon CSV
+  instead of replacing the originals. Rows are now matched on `image_filename`
+  and updated in place, keeping one row per image. The CSV is rewritten through
+  a temporary file and an atomic replace, so an interrupted write can no longer
+  truncate it.
+
 ## [4.0.1] — 2026-07-23
 
 Patch release. Fixes a packaging fault that prevented v4.0 from starting on
