@@ -340,7 +340,7 @@ class ExifManager:
                     piexif.ImageIFD.DateTime: now.strftime("%Y:%m:%d %H:%M:%S").encode(),
                     piexif.ImageIFD.Make: b"RAPIID",
                     piexif.ImageIFD.Model: device_info.encode(),
-                    piexif.ImageIFD.Software: b"RAPIID v4.0.1",
+                    piexif.ImageIFD.Software: b"RAPIID v4.1.0",
                     piexif.ImageIFD.ImageDescription:
                         f"Specimen: {taxon} - {accession} - {description.upper()}".encode(),
                 },
