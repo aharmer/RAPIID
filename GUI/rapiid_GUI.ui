@@ -396,6 +396,65 @@
                </widget>
               </item>
               <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_codeTypes">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_datamatrix">
+                  <property name="toolTip">
+                   <string>Read DataMatrix codes. These are the 2D square codes used on accession labels.</string>
+                  </property>
+                  <property name="text">
+                   <string>DataMatrix</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_qrcode">
+                  <property name="toolTip">
+                   <string>Read QR codes.</string>
+                  </property>
+                  <property name="text">
+                   <string>QR</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_barcode1d">
+                  <property name="toolTip">
+                   <string>Read 1D barcodes (EAN, UPC, Code 39, Code 128).</string>
+                  </property>
+                  <property name="text">
+                   <string>1D barcode</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_codeTypes">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
                <spacer name="verticalSpacer_6">
                 <property name="orientation">
                  <enum>Qt::Vertical</enum>

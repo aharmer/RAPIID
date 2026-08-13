@@ -2,6 +2,32 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Added
+
+- **QR code and 1D barcode reading.** The barcode camera previously read
+  DataMatrix only (`libdmtx` supports nothing else). Three checkboxes below the
+  barcode camera window now select which types to read — **DataMatrix**,
+  **QR**, and **1D barcode** (EAN, UPC, Code 39, Code 128). DataMatrix is
+  ticked by default, so existing behaviour is unchanged unless the extra types
+  are enabled. A value decoded from any type is entered as the accession
+  number. Types are attempted in the order above and only when ticked, so the
+  default configuration costs no extra work per frame.
+
+  QR and 1D reading use OpenCV's own detectors, so no new dependencies, DLLs or
+  installer content are involved. Both options are disabled automatically if
+  the OpenCV build in use does not provide them.
+
+### Fixed
+
+- 1D barcodes held close to the camera failed to decode. OpenCV's barcode
+  detector stops working once the individual bars exceed roughly four pixels
+  wide, so moving a barcode nearer the lens — the natural response to a failed
+  scan — made it worse. Decoding now retries on progressively downscaled
+  frames, which thins the bars and recovers those cases. Full size is tried
+  first, so a normally-sized barcode still costs a single pass.
+
 ## [4.1.0] — 2026-08-05
 
 ### Added

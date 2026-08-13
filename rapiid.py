@@ -14,6 +14,12 @@ import cv2
 import numpy as np
 import pylibdmtx.pylibdmtx as dmtx
 
+# QR and 1D barcode reading use OpenCV's own detectors, so they add no new
+# dependencies. Both have been in OpenCV for some time but are guarded here so
+# the app still runs (with those options disabled) against an older build.
+QR_AVAILABLE = hasattr(cv2, "QRCodeDetector")
+BARCODE_1D_AVAILABLE = hasattr(cv2, "barcode") and hasattr(cv2.barcode, "BarcodeDetector")
+
 # Optional imports with error handling
 try:
     import scripts.ymlRW as ymlRW
@@ -986,6 +992,15 @@ class UI(QMainWindow):
             self.webcam_arr_barcode = []
             self.cap_barcode = None
 
+            # Which code types to look for. Mirrored from the checkboxes into
+            # plain attributes because decoding runs on a worker thread, which
+            # must not read widget state directly.
+            self._read_datamatrix = True
+            self._read_qr = False
+            self._read_1d = False
+            self._qr_detector = None
+            self._barcode_detector = None
+
             # ── Setup that doesn't need camera hardware ───────────────────────
             self.setup_ui_connections()
             self.setup_file_system()
@@ -1288,6 +1303,8 @@ class UI(QMainWindow):
                 )
             )
 
+            self._setup_code_type_checkboxes()
+
             self._label_frame_signal.connect(self._display_frame)
             self._barcode_frame_signal.connect(self._display_frame)
 
@@ -1486,7 +1503,7 @@ class UI(QMainWindow):
 
                     # Decode on full-res frame — accuracy matters here
                     if frame_count % decode_interval == 0:
-                        decoded_data = self.decode_datamatrix(frame)
+                        decoded_data = self.decode_barcode(frame)
                         if decoded_data:
                             last_decoded = decoded_data
                             QtCore.QMetaObject.invokeMethod(
@@ -1541,24 +1558,55 @@ class UI(QMainWindow):
                 QtCore.Q_ARG(str, "Error in barcode camera.")
             )
 
-    def decode_datamatrix(self, frame):
-        """Attempt to decode a datamatrix barcode from a BGR frame.
+    def _setup_code_type_checkboxes(self):
+        """Wire the DataMatrix/QR/1D checkboxes, disabling unsupported types."""
+        try:
+            self.ui.checkBox_datamatrix.toggled.connect(self._on_code_types_changed)
+            self.ui.checkBox_qrcode.toggled.connect(self._on_code_types_changed)
+            self.ui.checkBox_barcode1d.toggled.connect(self._on_code_types_changed)
 
-        Strategy:
-          1. Resize to a fixed decode width (faster, consistent scale for dmtx)
-          2. Convert to grayscale and try dmtx.decode() directly — pylibdmtx
-             has its own internal region finder, so complex OpenCV preprocessing
-             often hurts more than it helps.
-          3. If that fails, try again on an adaptively thresholded image — this
-             helps with uneven or low-contrast lighting conditions.
+            # Grey out anything this OpenCV build cannot do, rather than
+            # offering an option that would silently never match.
+            if not QR_AVAILABLE:
+                self.ui.checkBox_qrcode.setChecked(False)
+                self.ui.checkBox_qrcode.setEnabled(False)
+                self.ui.checkBox_qrcode.setToolTip(
+                    "QR reading is unavailable in this OpenCV build."
+                )
+            if not BARCODE_1D_AVAILABLE:
+                self.ui.checkBox_barcode1d.setChecked(False)
+                self.ui.checkBox_barcode1d.setEnabled(False)
+                self.ui.checkBox_barcode1d.setToolTip(
+                    "1D barcode reading is unavailable in this OpenCV build."
+                )
 
-        The old approach used a fixed threshold + contour filter with `break`
-        statements that exited the loop on the first non-matching contour,
-        silently skipping the actual datamatrix region in most frames.
+            self._on_code_types_changed()
+        except Exception as e:
+            print(f"Error setting up code type checkboxes: {e}")
+
+    def _on_code_types_changed(self, _checked=None):
+        """Copy checkbox state into plain attributes for the decode thread."""
+        try:
+            self._read_datamatrix = self.ui.checkBox_datamatrix.isChecked()
+            self._read_qr = self.ui.checkBox_qrcode.isChecked()
+            self._read_1d = self.ui.checkBox_barcode1d.isChecked()
+
+            if not (self._read_datamatrix or self._read_qr or self._read_1d):
+                self.log_info("No code types selected — the barcode camera will not decode.")
+        except Exception as e:
+            print(f"Error reading code type checkboxes: {e}")
+
+    def decode_barcode(self, frame):
+        """Decode a DataMatrix, QR code or 1D barcode from a BGR frame.
+
+        Only the types ticked below the barcode camera are attempted, in that
+        order. Whatever decodes first is returned and used as the accession
+        number, regardless of which type it came from.
+
+        Frames are resized to a fixed decode width first: large frames slow
+        decoding down considerably and the extra detail is not needed.
         """
         try:
-            # Resize to a consistent decode width — large frames slow dmtx down
-            # considerably and small details aren't needed for barcode reading.
             decode_width = 640
             h, w = frame.shape[:2]
             if w != decode_width:
@@ -1568,12 +1616,40 @@ class UI(QMainWindow):
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            # Attempt 1: direct decode on grayscale
+            if self._read_datamatrix:
+                result = self._decode_datamatrix(gray)
+                if result:
+                    return result
+
+            if self._read_qr:
+                result = self._decode_qr(gray)
+                if result:
+                    return result
+
+            if self._read_1d:
+                result = self._decode_1d(gray)
+                if result:
+                    return result
+
+            return None
+
+        except Exception as e:
+            print(f"Error decoding barcode: {e}")
+            return None
+
+    def _decode_datamatrix(self, gray):
+        """Decode a DataMatrix from a grayscale frame.
+
+        pylibdmtx has its own internal region finder, so complex OpenCV
+        preprocessing often hurts more than it helps — a direct attempt comes
+        first, with an adaptive threshold as a fallback for uneven or
+        low-contrast lighting.
+        """
+        try:
             results = dmtx.decode(gray, timeout=200)
             if results:
                 return results[0].data.decode('utf-8')
 
-            # Attempt 2: adaptive threshold — helps with uneven lighting
             thresh = cv2.adaptiveThreshold(
                 gray, 255,
                 cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
@@ -1584,12 +1660,54 @@ class UI(QMainWindow):
             results = dmtx.decode(thresh, timeout=200)
             if results:
                 return results[0].data.decode('utf-8')
-
-            return None
-
         except Exception as e:
             print(f"Error decoding datamatrix: {e}")
+        return None
+
+    def _decode_qr(self, gray):
+        """Decode a QR code from a grayscale frame."""
+        if not QR_AVAILABLE:
             return None
+        try:
+            if self._qr_detector is None:
+                self._qr_detector = cv2.QRCodeDetector()
+            data, points, _ = self._qr_detector.detectAndDecode(gray)
+            if data:
+                return data
+        except Exception as e:
+            print(f"Error decoding QR code: {e}")
+        return None
+
+    # Scales tried when reading 1D barcodes. OpenCV's detector fails once the
+    # individual bars get too thick — holding a barcode close to the camera
+    # stops it decoding, which is the opposite of what a user expects. Retrying
+    # on a downscaled frame thins the bars and recovers those cases. Full size
+    # is tried first, so the common case still costs a single pass.
+    _BARCODE_1D_SCALES = (1.0, 0.5, 0.25)
+
+    def _decode_1d(self, gray):
+        """Decode a 1D barcode (EAN, UPC, Code 39, Code 128) from a frame."""
+        if not BARCODE_1D_AVAILABLE:
+            return None
+        try:
+            if self._barcode_detector is None:
+                self._barcode_detector = cv2.barcode.BarcodeDetector()
+
+            for scale in self._BARCODE_1D_SCALES:
+                if scale == 1.0:
+                    img = gray
+                else:
+                    img = cv2.resize(gray, None, fx=scale, fy=scale,
+                                     interpolation=cv2.INTER_AREA)
+                ok, decoded, _types, _points = \
+                    self._barcode_detector.detectAndDecodeWithType(img)
+                if ok and decoded:
+                    for value in decoded:
+                        if value:
+                            return value
+        except Exception as e:
+            print(f"Error decoding 1D barcode: {e}")
+        return None
 
     # ── Label camera live view ─────────────────────────────────────────────────
 

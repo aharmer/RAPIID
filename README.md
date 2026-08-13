@@ -148,7 +148,7 @@ On Windows, OpenCV uses the DirectShow backend (`CAP_DSHOW`) for all webcam oper
 
 1. **Select output folder** — click *Output folder...* and choose where images will be saved
 2. **Enter creator and taxon name** — used in file paths, EXIF metadata, and CSV logging
-3. **Start barcode camera** — select the barcode camera from the dropdown and click *Start live view*; point it at a DataMatrix label to auto-populate the accession number field
+3. **Start barcode camera** — select the barcode camera from the dropdown and click *Start live view*; point it at a code to auto-populate the accession number field. Tick the code types to read below the camera window — **DataMatrix** only by default (see [Barcode types](#barcode-types))
 4. **Start label camera(s)** — select each label camera, click *Start live view*; the live view appears in the grid
 5. **Capture** — click *Capture image* (or press `Alt+C`); images are saved, EXIF is embedded, and a CSV row is appended
 6. **Add cameras** — click *+ Add label camera* to add up to 4 cameras; the grid switches to 2-column layout automatically
@@ -161,6 +161,22 @@ A camera's name determines how its images are identified. Leaving the default na
 Renaming a camera to *Specimen* instead produces `<accession>_specimen.jpg`, and records "Specimen" in the image's EXIF description and in the `caption` and `title` CSV columns — so a specimen image is distinguishable from a label image without opening it.
 
 Names are reduced to a filename-safe form: *Whole specimen (dorsal)* becomes `_whole_specimen_dorsal`. If two cameras are given the same name, the camera number is appended so one capture cannot overwrite another.
+
+### Barcode types
+
+Three checkboxes below the barcode camera window select which code types are read:
+
+| Type | Default | Notes |
+|---|---|---|
+| **DataMatrix** | ✅ on | The 2D square codes used on accession labels. Read via `libdmtx` |
+| **QR** | off | Read via OpenCV |
+| **1D barcode** | off | EAN, UPC, Code 39, Code 128. Read via OpenCV |
+
+Whatever decodes first is entered as the **accession number**, regardless of type. Types are attempted in the order above, and only ticked types are attempted — so leaving the defaults alone costs nothing.
+
+Enabling extra types adds work per decoded frame, so tick only what you need. If no type is ticked, the barcode camera still shows a live view but decodes nothing, and the log says so.
+
+> **Holding a 1D barcode too close can stop it scanning.** The whole barcode must be within the frame, including a clear margin at both ends. If it will not read, move it further from the camera rather than closer.
 
 ---
 
