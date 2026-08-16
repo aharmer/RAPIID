@@ -2,7 +2,7 @@
 
 **Transforming specimen labels to digital data**
 
-RAPIID is a desktop imaging application for natural history collection digitisation workflows. It captures high-quality images of specimen labels using one or more cameras, decodes DataMatrix barcodes from accession labels, and automatically records capture metadata to CSV and EXIF tags — with no manual data entry required.
+RAPIID is a desktop imaging application for natural history collection digitisation workflows. It captures high-quality images of specimen labels using one or more cameras, decodes DataMatrix, QR and 1D barcodes from accession labels, and automatically records capture metadata to CSV and EXIF tags — with no manual data entry required.
 
 Developed at [Manaaki Whenua – Landcare Research](https://www.landcareresearch.co.nz/) as part of the [Chrysalis](https://chrysalis-ento.vercel.app/) digitisation platform.
 
@@ -36,111 +36,15 @@ If you want to modify the app, add features, or run it on macOS or Linux, follow
 
 ## Features
 
-- **Multi-camera label capture** — supports 1–4 simultaneous label cameras in a responsive 2-column grid view; single-camera mode fills the available screen
+- **Multi-camera label capture** — supports 1-n simultaneous label cameras in a responsive 2-column grid view; single-camera mode fills the available screen
 - **FLIR machine vision cameras** — full integration with FLIR cameras via the Spinnaker PySpin SDK, with per-camera exposure (ms), gain (dB), and gamma controls; high-quality HQ_LINEAR debayering at capture time
 - **Webcam support** — any DirectShow-compatible webcam (Windows) or V4L2/AVFoundation device (Linux/macOS). However, a camera with a very short focal range is recommended for accurate label viewing
-- **DataMatrix barcode decoding** — automatically decodes DataMatrix barcodes from a dedicated barcode camera, populating the accession number field; adaptive thresholding for reliable detection under varied lighting
+- **Barcode decoding** — automatically decodes DataMatrix, QR and 1D barcodes from a dedicated barcode camera, populating the accession number field; adaptive thresholding for reliable detection under varied lighting
 - **CSV metadata logging** — appends a metadata row to a per-taxon CSV file on every capture, recording filename, accession number, taxon, creator, date, camera device, and copyright
 - **EXIF embedding** — embeds creator, taxon, accession, date, copyright, and camera metadata directly into saved image files (requires Pillow and piexif)
 - **Config file save/load** — saves and restores session settings (creator, taxon, output folder, camera type, and FLIR exposure settings) as a YAML file
 - **Threaded architecture** — all camera streaming and discovery runs on worker threads; the UI remains fully responsive at all times
 - **Progress feedback** — animated progress dialogs during camera discovery and multi-camera capture sequences
-
----
-
-## Project structure for dev
-
-```
-rapiid/
-├── rapiid.py                   # Main application
-├── GUI/
-│   └── rapiid_GUI.py           # Auto-generated PyQt5 UI class (from .ui file)
-├── GUI/
-│   └── rapiid_GUI.ui           # Qt Designer UI definition
-├── images/
-│   └── RAPIID_icon.png         # Application icon (512×512 PNG)
-├── scripts/
-│   └── ymlRW.py                # YAML config read/write helper (optional)
-└── README.md
-```
-
----
-
-## Requirements
-
-### Python
-
-Python 3.8 or later is recommended.
-
-### Required dependencies
-
-```
-PyQt5
-opencv-python
-numpy
-pylibdmtx
-```
-
-### Optional dependencies
-
-| Package | Purpose | Behaviour if absent |
-|---|---|---|
-| `qt-material` | Dark material theme | Falls back to default Qt theme |
-| `Pillow` + `piexif` | EXIF metadata embedding | EXIF embedding silently skipped |
-| `PySpin` (Spinnaker SDK) | FLIR camera support | FLIR options hidden from UI |
-| `scripts.ymlRW` | Config file save/load | Config buttons disabled |
-
-### Installing dependencies
-
-```bash
-pip install PyQt5 opencv-python numpy pylibdmtx qt-material Pillow piexif
-```
-
-`pylibdmtx` requires the native `libdmtx` library. On Windows the PyPI wheel bundles it. On Linux:
-
-```bash
-sudo apt install libdmtx-dev
-pip install pylibdmtx
-```
-
-### FLIR Spinnaker SDK
-
-**Required only if you are using a FLIR camera.** If you are only using standard webcams, skip this section entirely.
-
-The Spinnaker SDK supplies the FLIR camera *driver*, which cannot be bundled into the RAPIID installer. Without it, RAPIID installs and runs normally but will not detect any FLIR camera — it reports this in its log panel at startup.
-
-Download the SDK from [Teledyne FLIR](https://www.flir.com/products/spinnaker-sdk/); a free account is required. On 64-bit Windows, choose the **x64** installer (`SpinnakerSDK_FULL_<version>_x64.exe`).
-
-Options to choose while installing:
-
-1. **Installation profile** — choose **Application Development**.
-2. **Visual Studio** — if you do not already have Visual Studio installed, accept the latest version offered by the installer, along with its recommended packages.
-3. **Camera interface** — tick **"I will use GigE cameras"** only if you actually have GigE cameras. The FLIR Blackfly S (BFS) used with RAPIID is **USB 3.0**, so this can be left unticked.
-4. **Evaluation programs** — optional. You can decline these.
-
-The SDK version does **not** need to match RAPIID. The app ships its own Spinnaker runtime (2.7.0.128) and uses it regardless of which SDK is installed — the SDK is needed only for the driver. Development and testing have been done against Spinnaker SDK **3.1.0.79**.
-
-> **Tip:** the SDK includes **SpinView**. If RAPIID cannot see your camera, open SpinView first — it uses the same driver but none of RAPIID's code. If SpinView cannot see the camera either, the problem is the driver, cable, port, or camera rather than RAPIID.
-
-**Developers only** — after installing the SDK, also install the matching Python wheel:
-
-```bash
-pip install spinnaker_python-<version>-cp<pyver>-win_amd64.whl
-```
-
----
-
-## Running the application
-
-```bash
-python rapiid.py
-```
-
-The application window appears immediately. Camera discovery runs in the background — a progress dialog is shown while webcams and FLIR cameras are detected. Controls are enabled once discovery completes.
-
-### Windows note
-
-On Windows, OpenCV uses the DirectShow backend (`CAP_DSHOW`) for all webcam operations. This avoids the MSMF `can't grab frame. Error: -1072873821` error that occurs with the default MSMF backend on many webcams.
 
 ---
 
@@ -151,7 +55,7 @@ On Windows, OpenCV uses the DirectShow backend (`CAP_DSHOW`) for all webcam oper
 3. **Start barcode camera** — select the barcode camera from the dropdown and click *Start live view*; point it at a code to auto-populate the accession number field. Tick the code types to read below the camera window — **DataMatrix** only by default (see [Barcode types](#barcode-types))
 4. **Start label camera(s)** — select each label camera, click *Start live view*; the live view appears in the grid
 5. **Capture** — click *Capture image* (or press `Alt+C`); images are saved, EXIF is embedded, and a CSV row is appended
-6. **Add cameras** — click *+ Add label camera* to add up to 4 cameras; the grid switches to 2-column layout automatically
+6. **Add cameras** — click *+ Add label camera* to add more cameras; the grid switches to 2-column layout automatically
 7. **Rename a camera (optional)** — each camera's name is editable in its header. Cameras are named *Label camera 1*, *2* … by default; rename one (e.g. to *Specimen*) if it captures something other than labels
 
 ### Renaming a camera
@@ -244,6 +148,103 @@ camera_settings:
 ```
 
 ---
+
+## Project structure for dev
+
+```
+rapiid/
+├── rapiid.py                   # Main application
+├── GUI/
+│   └── rapiid_GUI.py           # Auto-generated PyQt5 UI class (from .ui file)
+├── GUI/
+│   └── rapiid_GUI.ui           # Qt Designer UI definition
+├── images/
+│   └── RAPIID_icon.png         # Application icon (512×512 PNG)
+├── scripts/
+│   └── ymlRW.py                # YAML config read/write helper (optional)
+└── README.md
+```
+
+---
+
+### Requirements
+
+#### Python
+
+Python 3.8 or later is recommended.
+
+#### Required dependencies
+
+```
+PyQt5
+opencv-python
+numpy
+pylibdmtx
+```
+
+#### Optional dependencies
+
+| Package | Purpose | Behaviour if absent |
+|---|---|---|
+| `qt-material` | Dark material theme | Falls back to default Qt theme |
+| `Pillow` + `piexif` | EXIF metadata embedding | EXIF embedding silently skipped |
+| `PySpin` (Spinnaker SDK) | FLIR camera support | FLIR options hidden from UI |
+| `scripts.ymlRW` | Config file save/load | Config buttons disabled |
+
+#### Installing dependencies
+
+```bash
+pip install PyQt5 opencv-python numpy pylibdmtx qt-material Pillow piexif
+```
+
+`pylibdmtx` requires the native `libdmtx` library. On Windows the PyPI wheel bundles it. On Linux:
+
+```bash
+sudo apt install libdmtx-dev
+pip install pylibdmtx
+```
+
+#### FLIR Spinnaker SDK
+
+**Required only if you are using a FLIR camera.** If you are only using standard webcams, skip this section entirely.
+
+The Spinnaker SDK supplies the FLIR camera *driver*, which cannot be bundled into the RAPIID installer. Without it, RAPIID installs and runs normally but will not detect any FLIR camera — it reports this in its log panel at startup.
+
+Download the SDK from [Teledyne FLIR](https://www.flir.com/products/spinnaker-sdk/); a free account is required. On 64-bit Windows, choose the **x64** installer (`SpinnakerSDK_FULL_<version>_x64.exe`).
+
+Options to choose while installing:
+
+1. **Installation profile** — choose **Application Development**.
+2. **Visual Studio** — if you do not already have Visual Studio installed, accept the latest version offered by the installer, along with its recommended packages.
+3. **Camera interface** — tick **"I will use GigE cameras"** only if you actually have GigE cameras. The FLIR Blackfly S (BFS) used with RAPIID is **USB 3.0**, so this can be left unticked.
+4. **Evaluation programs** — optional. You can decline these.
+
+The SDK version does **not** need to match RAPIID. The app ships its own Spinnaker runtime (2.7.0.128) and uses it regardless of which SDK is installed — the SDK is needed only for the driver. Development and testing have been done against Spinnaker SDK **3.1.0.79**.
+
+> **Tip:** the SDK includes **SpinView**. If RAPIID cannot see your camera, open SpinView first — it uses the same driver but none of RAPIID's code. If SpinView cannot see the camera either, the problem is the driver, cable, port, or camera rather than RAPIID.
+
+**Developers only** — after installing the SDK, also install the matching Python wheel:
+
+```bash
+pip install spinnaker_python-<version>-cp<pyver>-win_amd64.whl
+```
+
+---
+
+### Running the application
+
+```bash
+python rapiid.py
+```
+
+The application window appears immediately. Camera discovery runs in the background — a progress dialog is shown while webcams and FLIR cameras are detected. Controls are enabled once discovery completes.
+
+#### Windows note
+
+On Windows, OpenCV uses the DirectShow backend (`CAP_DSHOW`) for all webcam operations. This avoids the MSMF `can't grab frame. Error: -1072873821` error that occurs with the default MSMF backend on many webcams.
+
+---
+
 
 ## Architecture notes
 
