@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented here.
 
+## [4.3.2] — 2026-11-16
+
+### Fixed
+
+- **FLIR cameras could fail to be detected with "Could not load producer
+  ... [-1012]".** Spinnaker locates its GenTL producer through environment
+  variables set by the Spinnaker SDK installer. Launched into an environment
+  where those were not visible, RAPIID reported no camera even though one was
+  connected with its driver installed — and the failure cleared on a later
+  launch, making it look intermittent. RAPIID already ships the same producer
+  inside PySpin, and now falls back to that copy when neither variable is set.
+  Values set by the SDK are left untouched, since its producer matches its
+  driver. The startup log records which producer is in use.
+- **The stream buffer count request was impossible on some cameras.** A fixed
+  request of 2 buffers threw on models with a higher minimum — the Blackfly S
+  requires 3 — so the setting was silently abandoned and the driver's default
+  pool used instead. The request is now clamped to the camera's own minimum and
+  maximum, so the intended low-latency buffer pool is actually applied.
+
 ## [4.3.1] — 2026-11-16
 
 ### Fixed

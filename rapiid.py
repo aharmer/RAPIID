@@ -57,6 +57,50 @@ SPINNAKER_HINT = (
     "list of installer options. Not required if you are only using webcams."
 )
 
+def _ensure_gentl_producer():
+    """Point Spinnaker at the GenTL producer bundled with RAPIID, if needed.
+
+    Spinnaker finds its GenTL producer through environment variables that the
+    Spinnaker SDK installer sets. An app launched into an environment where
+    those are not visible fails with "Could not load producer ... [-1012]"
+    even though the camera is connected and its driver is installed.
+
+    RAPIID ships the same producer inside PySpin, so fall back to that copy.
+    Existing values are deliberately left alone: if the SDK set them, its
+    producer matches its driver and should be preferred.
+
+    Returns the producer path if this function supplied one, else None.
+    """
+    try:
+        import importlib.util
+
+        candidates = []
+        if getattr(sys, "frozen", False):
+            candidates.append(Path(sys.executable).parent / "lib" / "PySpin")
+        try:
+            spec = importlib.util.find_spec("PySpin")
+            if spec and spec.submodule_search_locations:
+                candidates.extend(Path(loc) for loc in spec.submodule_search_locations)
+        except Exception:
+            pass
+
+        for base in candidates:
+            cti = base / "FLIR_GenTL_v140.cti"
+            if not cti.exists():
+                continue
+            if os.environ.get("FLIR_GENTL64_CTI_VS140") or                     os.environ.get("GENICAM_GENTL64_PATH"):
+                return None          # the SDK has already configured this
+            os.environ["FLIR_GENTL64_CTI_VS140"] = str(cti)
+            os.environ["GENICAM_GENTL64_PATH"] = str(base)
+            return str(cti)
+    except Exception:
+        pass
+    return None
+
+
+# Must run before PySpin is imported, so the producer is resolvable.
+GENTL_PRODUCER = _ensure_gentl_producer()
+
 # FLIR camera imports
 try:
     import PySpin
@@ -160,7 +204,11 @@ class FLIRCamera:
                 self.camera.TLStream.StreamBufferCountMode.SetValue(
                     PySpin.StreamBufferCountMode_Manual
                 )
-                self.camera.TLStream.StreamBufferCountManual.SetValue(2)
+                # A small pool keeps live-view latency low, but the minimum is
+                # model-specific (3 on the Blackfly S) and asking for fewer
+                # throws rather than clamping, so ask for the smallest allowed.
+                node = self.camera.TLStream.StreamBufferCountManual
+                node.SetValue(min(max(2, node.GetMin()), node.GetMax()))
             except Exception as ex:
                 print(f"Note: using the driver's default stream buffer count "
                       f"({ex})")
@@ -507,6 +555,8 @@ def log_environment():
         LOGGER.info("opencv       %s", cv2.__version__)
         LOGGER.info("qt_material  %s", "available" if QT_MATERIAL_AVAILABLE else "missing")
         LOGGER.info("PySpin       %s", "available" if FLIR_AVAILABLE else "missing")
+        LOGGER.info("GenTL        %s", f"using bundled producer {GENTL_PRODUCER}"
+                    if GENTL_PRODUCER else "using the Spinnaker SDK's own settings")
         LOGGER.info("QR / 1D      %s / %s", QR_AVAILABLE, BARCODE_1D_AVAILABLE)
         if FLIR_AVAILABLE:
             try:
@@ -553,7 +603,7 @@ class ExifManager:
                     piexif.ImageIFD.DateTime: now.strftime("%Y:%m:%d %H:%M:%S").encode(),
                     piexif.ImageIFD.Make: b"RAPIID",
                     piexif.ImageIFD.Model: device_info.encode(),
-                    piexif.ImageIFD.Software: b"RAPIID v4.3.1",
+                    piexif.ImageIFD.Software: b"RAPIID v4.3.2",
                     piexif.ImageIFD.ImageDescription:
                         f"Specimen: {taxon} - {accession} - {description.upper()}".encode(),
                 },
