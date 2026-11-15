@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here.
 
+## [4.3.4] — 2026-11-16
+
+### Added
+
+- **The FLIR camera's USB link speed is logged when it initialises**, along with
+  the camera model. A USB3 camera plugged into a USB2 port still works —
+  USB3 Vision uses bulk transfers, which degrade to a lower frame rate rather
+  than failing — so a misplugged camera or hub appears as an unexplained
+  slowdown rather than an error. The log now names the negotiated speed, and
+  says plainly when it is not a USB3 link.
+- **The live-view diagnostic now reports the measured frame rate** alongside
+  resolution and brightness, and flags a rate too low to be healthy. Together
+  with the link speed, a starved USB bus is now visible at a glance instead of
+  having to be inferred from log timestamps.
+
+  These were prompted by a real diagnosis: a camera hub moved to a USB2 port
+  left two webcams unable to stream at all (UVC uses isochronous transfers,
+  which are reserved up front and fail outright when the bandwidth is not
+  available, delivering black frames) while the FLIR camera continued working
+  at roughly a twelfth of its normal frame rate.
+
 ## [4.3.3] — 2026-11-16
 
 ### Fixed

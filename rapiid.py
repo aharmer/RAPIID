@@ -187,6 +187,7 @@ class FLIRCamera:
             self.camera = self.cam_list[self.camera_index]
             self.camera.Init()
 
+            self.log_link_speed()
             self.reset_to_defaults()
 
             try:
@@ -219,6 +220,42 @@ class FLIRCamera:
         except Exception as ex:
             print(f"Error initializing FLIR camera: {ex}")
             return False
+
+    def log_link_speed(self):
+        """Report the camera model and its USB link speed.
+
+        A USB3 camera in a USB2 port still works: USB3 Vision uses bulk
+        transfers, which degrade to a lower frame rate rather than failing.
+        That makes a misplugged cable or hub look like a mysterious slowdown
+        instead of an error, so name the negotiated speed up front.
+        """
+        try:
+            tl = self.camera.GetTLDeviceNodeMap()
+
+            def read(name):
+                node = PySpin.CEnumerationPtr(tl.GetNode(name))
+                if PySpin.IsAvailable(node) and PySpin.IsReadable(node):
+                    return node.GetCurrentEntry().GetSymbolic()
+                node = PySpin.CStringPtr(tl.GetNode(name))
+                if PySpin.IsAvailable(node) and PySpin.IsReadable(node):
+                    return node.GetValue()
+                return None
+
+            model = read("DeviceModelName")
+            speed = read("DeviceCurrentSpeed")
+            parts = [str(model)] if model else []
+            if speed:
+                parts.append(f"link {speed}")
+            if not parts:
+                return
+            msg = "FLIR camera: " + ", ".join(parts)
+            if speed and "super" not in str(speed).lower():
+                msg += (" - this is NOT a USB3 link, so frame rates will be "
+                        "far lower than normal. Check the camera or its hub "
+                        "is plugged into a USB3 port.")
+            print(msg)
+        except Exception as ex:
+            print(f"Note: could not read FLIR link speed: {ex}")
 
     def reset_to_defaults(self):
         """Load the camera's Default user set before applying our own settings.
@@ -603,7 +640,7 @@ class ExifManager:
                     piexif.ImageIFD.DateTime: now.strftime("%Y:%m:%d %H:%M:%S").encode(),
                     piexif.ImageIFD.Make: b"RAPIID",
                     piexif.ImageIFD.Model: device_info.encode(),
-                    piexif.ImageIFD.Software: b"RAPIID v4.3.3",
+                    piexif.ImageIFD.Software: b"RAPIID v4.3.4",
                     piexif.ImageIFD.ImageDescription:
                         f"Specimen: {taxon} - {accession} - {description.upper()}".encode(),
                 },
@@ -2085,6 +2122,7 @@ class UI(QMainWindow):
         read_failures = 0
         diag_frames = 0
         diag_sum = 0.0
+        diag_t0 = None
         diag_done = False
 
         try:
@@ -2117,18 +2155,29 @@ class UI(QMainWindow):
                     slot.frame = frame   # store full-res BGR for HQ capture
 
                     if not diag_done and diag_frames < 15:
+                        if diag_frames == 0:
+                            diag_t0 = time.monotonic()
                         diag_frames += 1
                         diag_sum += float(frame.mean())
                         if diag_frames == 15:
                             diag_done = True
                             avg = diag_sum / diag_frames
+                            dt = time.monotonic() - diag_t0
+                            # 14 intervals between 15 frames
+                            fps = (diag_frames - 1) / dt if dt > 0 else 0.0
                             msg = (f"{slot.camera_name()}: {slot.selected_camera} "
-                                   f"{frame.shape[1]}x{frame.shape[0]}, mean "
-                                   f"brightness {avg:.1f}")
+                                   f"{frame.shape[1]}x{frame.shape[0]}, "
+                                   f"{fps:.1f} fps, mean brightness {avg:.1f}")
                             if avg < 3.0:
                                 msg += (" - frames are arriving but BLACK; check "
                                         "this is the intended device and that it "
                                         "is not covered or in use elsewhere")
+                            elif fps < 5.0:
+                                msg += (" - that frame rate is very low for a live "
+                                        "view; the USB link is probably short of "
+                                        "bandwidth (check the camera or its hub is "
+                                        "in a USB3 port, and that another camera is "
+                                        "not sharing it)")
                             self.log_info(msg)
 
                     disp_w = slot.live_view.width()
