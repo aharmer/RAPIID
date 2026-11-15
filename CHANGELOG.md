@@ -2,6 +2,28 @@
 
 All notable changes to this project are documented here.
 
+## [4.3.1] — 2026-11-16
+
+### Fixed
+
+- **High-quality FLIR capture no longer restarts the stream.** 4.3.0 still
+  stopped and restarted acquisition before grabbing a capture frame, on the
+  assumption that a fresh acquisition was needed for full quality. It is not:
+  the only difference between a live-view frame and a capture frame is the
+  debayering algorithm, which is applied on the host to identical sensor data.
+  The restart was itself the cause of the failures — the first `GetNextImage`
+  after `BeginAcquisition` can take much longer than the exposure-based timeout
+  allowed, producing `Failed waiting for EventData on NEW_BUFFER_DATA event
+  [-1011]` while the live view carried on working normally. Captures now take
+  the next frame from the running stream, with a more generous timeout and one
+  retry for a buffer that arrives incomplete. Acquisition is only started when
+  the live view is not already running.
+- The stream buffer count message is no longer phrased as a warning, and now
+  reports the underlying reason. A small manual buffer count is only a
+  latency preference; not all models permit it, and the driver's default pool
+  works correctly. `StreamBufferHandlingMode` (NewestOnly) is the setting that
+  actually matters, and that one succeeds.
+
 ## [4.3.0] — 2026-11-16
 
 ### Added

@@ -149,16 +149,21 @@ class FLIRCamera:
                 self.camera.TLStream.StreamBufferHandlingMode.SetValue(
                     PySpin.StreamBufferHandlingMode_NewestOnly
                 )
-            except Exception:
-                print("Warning: could not set StreamBufferHandlingMode")
+            except Exception as ex:
+                print(f"Warning: could not set StreamBufferHandlingMode: {ex}")
 
+            # A small manual buffer count keeps live-view latency low, but it is
+            # only a preference: not all models allow it, and the driver default
+            # (a larger pool) works fine. NewestOnly above is what actually
+            # matters for showing a current frame.
             try:
                 self.camera.TLStream.StreamBufferCountMode.SetValue(
                     PySpin.StreamBufferCountMode_Manual
                 )
                 self.camera.TLStream.StreamBufferCountManual.SetValue(2)
-            except Exception:
-                print("Warning: could not set StreamBufferCount")
+            except Exception as ex:
+                print(f"Note: using the driver's default stream buffer count "
+                      f"({ex})")
 
             self.is_initialized = True
             print("FLIR camera initialized successfully")
@@ -318,16 +323,23 @@ class FLIRCamera:
             return None
 
     def get_frame_hq(self):
-        """Grab a single HQ_LINEAR frame for saving.
+        """Grab a single frame and demosaic it with HQ_LINEAR for saving.
 
-        Holds _lock and sets _hq_pending for the duration so the live-view
-        worker cannot consume the frame this is waiting for. Without that, the
-        worker thread competes for the stream's two NewestOnly buffers and this
-        grab can time out, which surfaces to the user as "no frame available"
-        even though the live view is clearly working.
+        The only difference from a live-view frame is the debayering algorithm,
+        which is applied on the host: the sensor data is identical. So this
+        takes the next frame from the stream that is already running rather
+        than stopping and restarting acquisition.
 
-        Records the reason in last_error on failure so the caller can report it
-        rather than failing silently.
+        An earlier version did restart the stream, on the assumption that a
+        fresh acquisition was needed for a full-quality frame. It is not, and
+        the restart was the cause of capture failures: the first GetNextImage
+        after BeginAcquisition can take far longer than the exposure-based
+        timeout allows, producing "Failed waiting for EventData on
+        NEW_BUFFER_DATA event [-1011]" while the live view carried on working.
+
+        Acquisition is only started here if the live view is not running, and
+        is stopped again afterwards in that case. _lock and _hq_pending keep
+        this and the live-view worker from calling GetNextImage concurrently.
         """
         if not self.is_initialized:
             self.last_error = "camera not initialised"
@@ -338,42 +350,47 @@ class FLIRCamera:
         frame = None
         try:
             with self._lock:
-                was_acquiring = self.is_acquiring
-                if was_acquiring:
-                    self.stop_acquisition()
+                started_here = False
                 try:
-                    self.camera.BeginAcquisition()
-                    self.is_acquiring = True
+                    if not self.is_acquiring:
+                        self.camera.BeginAcquisition()
+                        self.is_acquiring = True
+                        started_here = True
 
                     try:
                         exposure_ms = self.camera.ExposureTime.GetValue() / 1000.0
-                        timeout_ms = max(200, int(exposure_ms) + 500)
+                        timeout_ms = max(1000, int(exposure_ms) + 1000)
                     except Exception:
                         timeout_ms = 2000
 
-                    image_result = self.camera.GetNextImage(timeout_ms)
-                    if image_result.IsIncomplete():
-                        self.last_error = (
-                            f"incomplete image (status {image_result.GetImageStatus()})"
-                        )
-                    else:
-                        image_converted = image_result.Convert(
-                            PySpin.PixelFormat_BGR8, PySpin.HQ_LINEAR
-                        )
-                        frame = image_converted.GetNDArray().copy()
-                    image_result.Release()
+                    # Two attempts: with NewestOnly handling the first buffer
+                    # returned can be one that was already in flight and is
+                    # reported incomplete.
+                    for _attempt in range(2):
+                        image_result = self.camera.GetNextImage(timeout_ms)
+                        try:
+                            if image_result.IsIncomplete():
+                                self.last_error = (
+                                    "incomplete image "
+                                    f"(status {image_result.GetImageStatus()})"
+                                )
+                                continue
+                            image_converted = image_result.Convert(
+                                PySpin.PixelFormat_BGR8, PySpin.HQ_LINEAR
+                            )
+                            frame = image_converted.GetNDArray().copy()
+                            self.last_error = None
+                            break
+                        finally:
+                            image_result.Release()
 
                 except Exception as ex:
                     self.last_error = str(ex)
                     print(f"Error capturing HQ frame: {ex}")
                 finally:
-                    self.stop_acquisition()
-                    if was_acquiring:
-                        try:
-                            self.camera.BeginAcquisition()
-                            self.is_acquiring = True
-                        except Exception as ex:
-                            print(f"Error restarting acquisition after capture: {ex}")
+                    # Leave the live view streaming if it was already running.
+                    if started_here:
+                        self.stop_acquisition()
         finally:
             self._hq_pending.clear()
 
@@ -536,7 +553,7 @@ class ExifManager:
                     piexif.ImageIFD.DateTime: now.strftime("%Y:%m:%d %H:%M:%S").encode(),
                     piexif.ImageIFD.Make: b"RAPIID",
                     piexif.ImageIFD.Model: device_info.encode(),
-                    piexif.ImageIFD.Software: b"RAPIID v4.3.0",
+                    piexif.ImageIFD.Software: b"RAPIID v4.3.1",
                     piexif.ImageIFD.ImageDescription:
                         f"Specimen: {taxon} - {accession} - {description.upper()}".encode(),
                 },
