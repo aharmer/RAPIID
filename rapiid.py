@@ -603,7 +603,7 @@ class ExifManager:
                     piexif.ImageIFD.DateTime: now.strftime("%Y:%m:%d %H:%M:%S").encode(),
                     piexif.ImageIFD.Make: b"RAPIID",
                     piexif.ImageIFD.Model: device_info.encode(),
-                    piexif.ImageIFD.Software: b"RAPIID v4.3.2",
+                    piexif.ImageIFD.Software: b"RAPIID v4.3.3",
                     piexif.ImageIFD.ImageDescription:
                         f"Specimen: {taxon} - {accession} - {description.upper()}".encode(),
                 },
@@ -983,6 +983,9 @@ class LabelCameraSlot(QWidget):
                 self.cap = cv2.VideoCapture(webcam_id, backend)
                 self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
                 self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+                print(f"{camera_name}: opened={self.cap.isOpened()} "
+                      f"{int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))}x"
+                      f"{int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))}")
         except Exception as e:
             print(f"Slot {self.slot_index}: error opening cap for {camera_name}: {e}")
 
@@ -1000,6 +1003,13 @@ class LabelCameraSlot(QWidget):
                     self.cam_combo.setCurrentIndex(idx)
                 self.cam_combo.blockSignals(False)
                 return
+            # Already the active selection: nothing to do. The combo re-emits
+            # currentTextChanged when sync_camera_availability restyles its
+            # items, and reopening would leak a device handle.
+            if selected and selected == self.selected_camera:
+                if self.label_camera_type == 'FLIR' or self.cap is not None:
+                    return
+
             # Clean up existing FLIR instance if switching away from it
             if self.flir_camera and self.flir_camera.is_initialized:
                 self.flir_camera.stop_acquisition()
@@ -1069,17 +1079,23 @@ class LabelCameraSlot(QWidget):
         signal handler to enforce when the user makes a selection."""
         self._taken_cameras = taken_cameras
         model = self.cam_combo.model()
-        for i in range(self.cam_combo.count()):
-            item = model.item(i)
-            name = item.text()
-            if name == "— Select camera —":
-                continue
-            if name in taken_cameras:
-                item.setForeground(QtGui.QColor(150, 150, 150))
-                font = item.font(); font.setItalic(True); item.setFont(font)
-            else:
-                item.setForeground(QtGui.QColor())   # reset to theme default
-                font = item.font(); font.setItalic(False); item.setFont(font)
+        # Setting item roles emits dataChanged, which QComboBox forwards as
+        # currentTextChanged - re-entering the selection handler. Block it.
+        self.cam_combo.blockSignals(True)
+        try:
+            for i in range(self.cam_combo.count()):
+                item = model.item(i)
+                name = item.text()
+                if name == "— Select camera —":
+                    continue
+                if name in taken_cameras:
+                    item.setForeground(QtGui.QColor(150, 150, 150))
+                    font = item.font(); font.setItalic(True); item.setFont(font)
+                else:
+                    item.setForeground(QtGui.QColor())   # reset to theme default
+                    font = item.font(); font.setItalic(False); item.setFont(font)
+        finally:
+            self.cam_combo.blockSignals(False)
 
     def get_frame_for_capture(self):
         """Return (frame, note) — the best frame for saving, plus any caveat.
@@ -1534,17 +1550,21 @@ class UI(QMainWindow):
         barcode_others = all_taken - ({barcode_selected} if barcode_selected else set())
         self._barcode_taken_cameras = barcode_others
         model = self.ui.comboBox_selectBarcodeCam.model()
-        for i in range(self.ui.comboBox_selectBarcodeCam.count()):
-            item = model.item(i)
-            name = item.text()
-            if name == "— Select camera —":
-                continue
-            if name in barcode_others:
-                item.setForeground(QtGui.QColor(150, 150, 150))
-                font = item.font(); font.setItalic(True); item.setFont(font)
-            else:
-                item.setForeground(QtGui.QColor())
-                font = item.font(); font.setItalic(False); item.setFont(font)
+        self.ui.comboBox_selectBarcodeCam.blockSignals(True)
+        try:
+            for i in range(self.ui.comboBox_selectBarcodeCam.count()):
+                item = model.item(i)
+                name = item.text()
+                if name == "— Select camera —":
+                    continue
+                if name in barcode_others:
+                    item.setForeground(QtGui.QColor(150, 150, 150))
+                    font = item.font(); font.setItalic(True); item.setFont(font)
+                else:
+                    item.setForeground(QtGui.QColor())
+                    font = item.font(); font.setItalic(False); item.setFont(font)
+        finally:
+            self.ui.comboBox_selectBarcodeCam.blockSignals(False)
 
     def _update_single_slot_width(self):
         """Cap the single slot's width to 80% of the window width so the
@@ -1716,8 +1736,19 @@ class UI(QMainWindow):
                     self.cap_barcode = None
                 self._refresh_camera_availability()
                 return
-            if self.barcode_webcamView and self.cap_barcode:
+            # Already on this camera with an open handle: nothing to do.
+            # currentTextChanged fires again when _refresh_camera_availability
+            # restyles the dropdown items, and reopening leaks the old handle.
+            if selected_camera == self.selected_barcodecam and self.cap_barcode:
+                return
+
+            # Always release the previous handle. This was previously
+            # conditional on the live view running, so repeated selections left
+            # orphaned DirectShow handles open on the device. Enough of them and
+            # another slot can no longer get a working stream from that camera.
+            if self.cap_barcode:
                 self.cap_barcode.release()
+                self.cap_barcode = None
             webcam_id = int(selected_camera.split()[-1])
             backend = cv2.CAP_DSHOW if sys.platform == "win32" else cv2.CAP_ANY
             self.cap_barcode = cv2.VideoCapture(webcam_id, backend)
@@ -2048,6 +2079,14 @@ class UI(QMainWindow):
         import time
         webcam_frame_interval = 1.0 / 15
 
+        # One-off diagnostics for this live-view session. A blank live view can
+        # mean either that no frames arrive or that the frames themselves are
+        # black, and those have entirely different causes - so report which.
+        read_failures = 0
+        diag_frames = 0
+        diag_sum = 0.0
+        diag_done = False
+
         try:
             while slot.label_webcamView:
                 t_start = time.monotonic()
@@ -2056,8 +2095,18 @@ class UI(QMainWindow):
                 if slot.label_camera_type == 'Webcam' and slot.cap:
                     ret, frame = slot.cap.read()
                     if not ret:
+                        read_failures += 1
+                        if read_failures == 25 and not diag_done:
+                            diag_done = True
+                            self.log_info(
+                                f"{slot.camera_name()}: no frames from "
+                                f"{slot.selected_camera} after 25 attempts "
+                                f"(handle open: {slot.cap.isOpened()}). The "
+                                f"device may be in use by another application."
+                            )
                         time.sleep(0.05)
                         continue
+                    read_failures = 0
                 elif slot.label_camera_type == 'FLIR' and slot.flir_camera:
                     frame = slot.flir_camera.get_frame()
                     if frame is None:
@@ -2066,6 +2115,21 @@ class UI(QMainWindow):
 
                 if frame is not None:
                     slot.frame = frame   # store full-res BGR for HQ capture
+
+                    if not diag_done and diag_frames < 15:
+                        diag_frames += 1
+                        diag_sum += float(frame.mean())
+                        if diag_frames == 15:
+                            diag_done = True
+                            avg = diag_sum / diag_frames
+                            msg = (f"{slot.camera_name()}: {slot.selected_camera} "
+                                   f"{frame.shape[1]}x{frame.shape[0]}, mean "
+                                   f"brightness {avg:.1f}")
+                            if avg < 3.0:
+                                msg += (" - frames are arriving but BLACK; check "
+                                        "this is the intended device and that it "
+                                        "is not covered or in use elsewhere")
+                            self.log_info(msg)
 
                     disp_w = slot.live_view.width()
                     disp_h = slot.live_view.height()

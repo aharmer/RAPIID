@@ -2,6 +2,34 @@
 
 All notable changes to this project are documented here.
 
+## [4.3.3] — 2026-11-16
+
+### Fixed
+
+- **A label camera could show a black live view while the same webcam worked
+  in the barcode slot.** Selecting a camera opens its device handle
+  immediately, and the handler ran several times for a single selection:
+  restyling the dropdown to grey out cameras taken by other slots sets item
+  roles, which Qt reports as `dataChanged` and `QComboBox` forwards as
+  `currentTextChanged`, re-entering the handler. The barcode path also only
+  released its previous handle when its live view was already running, so each
+  re-entry opened the device again and orphaned the last handle — four opens on
+  a single startup selection. Webcams that tolerate being opened repeatedly
+  were unaffected, which is why this did not reproduce on every machine; on
+  others, no handle was left to give another slot a working stream.
+
+  Selection is now idempotent in both the label and barcode paths, the previous
+  handle is always released before a new one is opened, and the dropdowns block
+  signals while being restyled.
+
+### Added
+
+- The label camera live view now logs, once per session, the device it opened,
+  the resolution it negotiated, and the mean brightness of the first frames. A
+  blank live view can mean either that no frames are arriving or that the frames
+  themselves are black, and those have different causes; the log now says which,
+  and reports separately when the handle is open but no frames arrive at all.
+
 ## [4.3.2] — 2026-11-16
 
 ### Fixed
