@@ -2,6 +2,44 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Added
+
+- **Log file.** Each session is logged to
+  `%LOCALAPPDATA%\RAPIID\logs\rapiid.log`, rotating at 1 MB with three
+  previous copies kept. It records app and library versions, how many FLIR
+  cameras were detected, everything shown in the in-app log panel, and errors
+  that never reach the interface. The installed app is frozen with
+  `base="Win32GUI"` and has no console, so `print()` output and tracebacks were
+  previously lost entirely; stdout and stderr are now redirected to the log.
+  The path is shown in the log panel at startup.
+- **FLIR cameras are reset to their Default user set on initialisation.** FLIR
+  cameras store configuration in hardware, so a camera used with other software
+  or on another computer could return with trigger mode enabled, a very long
+  exposure, or a throttled frame rate still set — breaking acquisition in ways
+  that looked like an application fault and that restarting RAPIID could not
+  clear. Each session now starts from a known camera state. Trigger mode is
+  also disabled explicitly.
+
+### Fixed
+
+- **Capture could report "no frame available" while the live view was working.**
+  FLIR captures used a dedicated high-quality grab with no fallback, so any
+  failure there failed the whole capture even though a full-resolution
+  live-view frame was already available. Capture now falls back to that frame,
+  which differs only in debayering quality, and reports both the fallback and
+  the underlying error in the log.
+- **Race between the live view and high-quality capture.** The capture grab
+  stopped and restarted acquisition from the GUI thread while the live-view
+  worker thread was still calling `GetNextImage` on the same camera. With
+  `NewestOnly` buffer handling and only two buffers, the worker could consume
+  the frame the capture was waiting for, causing it to time out. Access to the
+  camera is now serialised, and the live view stands aside for the duration of
+  a capture.
+- The reason a high-quality grab failed is now reported instead of being
+  printed to a console that does not exist in the installed app.
+
 ## [4.2.0] — 2026-08-17
 
 ### Added

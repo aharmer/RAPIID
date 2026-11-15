@@ -2,7 +2,10 @@ import sys
 import os
 import csv
 import re
+import logging
+import threading
 import traceback
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 import datetime
 from PyQt5 import QtWidgets, QtGui, QtCore
@@ -113,6 +116,14 @@ class FLIRCamera:
         self.camera = None
         self.is_initialized = False
         self.is_acquiring = False
+        self.last_error = None
+
+        # The live-view worker thread and the GUI thread both reach into the
+        # same PySpin camera. _lock serialises that access; _hq_pending asks
+        # the worker to stand aside so a high-quality capture is not starved
+        # of buffers by the live stream.
+        self._lock = threading.RLock()
+        self._hq_pending = threading.Event()
 
     def initialize(self):
         if not FLIR_AVAILABLE:
@@ -131,6 +142,8 @@ class FLIRCamera:
                 return False
             self.camera = self.cam_list[self.camera_index]
             self.camera.Init()
+
+            self.reset_to_defaults()
 
             try:
                 self.camera.TLStream.StreamBufferHandlingMode.SetValue(
@@ -153,6 +166,36 @@ class FLIRCamera:
         except Exception as ex:
             print(f"Error initializing FLIR camera: {ex}")
             return False
+
+    def reset_to_defaults(self):
+        """Load the camera's Default user set before applying our own settings.
+
+        FLIR cameras keep configuration in hardware, not in this application.
+        A camera that has been used with other software — SpinView, or anything
+        on another computer — can come back with trigger mode enabled, a very
+        long exposure, or a throttled frame rate still in place. Acquisition
+        then misbehaves in ways that look like an application fault, and
+        reinstalling or restarting RAPIID does not clear it.
+
+        Loading the Default user set at startup makes each session begin from a
+        known state. Failure here is logged but never fatal: some models expose
+        no user sets, and the camera may still work perfectly well.
+        """
+        try:
+            self.camera.UserSetSelector.SetValue(PySpin.UserSetSelector_Default)
+            self.camera.UserSetLoad.Execute()
+            print("FLIR camera reset to factory defaults (Default user set)")
+        except Exception as ex:
+            print(f"Warning: could not load FLIR Default user set: {ex}")
+
+        # Explicitly clear trigger mode as well. The Default user set should
+        # already have it off, but a camera left in triggered mode produces no
+        # frames at all, so it is worth being certain.
+        try:
+            if self.camera.TriggerMode.GetAccessMode() == PySpin.RW:
+                self.camera.TriggerMode.SetValue(PySpin.TriggerMode_Off)
+        except Exception as ex:
+            print(f"Warning: could not disable FLIR trigger mode: {ex}")
 
     def configure_camera(self, exposure=None, gain=None, gamma=None,
                          set_acquisition_mode=True, live_fps=20):
@@ -225,6 +268,27 @@ class FLIRCamera:
     def get_frame(self):
         if not self.is_initialized or not self.is_acquiring:
             return None
+        # Stand aside while a high-quality capture is in progress, rather than
+        # competing with it for the stream's two buffers.
+        if self._hq_pending.is_set():
+            return None
+        try:
+            with self._lock:
+                if (not self.is_initialized or not self.is_acquiring
+                        or self._hq_pending.is_set()):
+                    return None
+                return self._grab_live_frame()
+        except PySpin.SpinnakerException as ex:
+            error_str = str(ex)
+            if not any(code in error_str for code in ("-1011", "-1013", "-1010")):
+                print(f"Error getting frame: {ex}")
+            return None
+        except Exception as ex:
+            print(f"Unexpected error getting frame: {ex}")
+            return None
+
+    def _grab_live_frame(self):
+        """Grab one live-view frame. Caller must hold _lock."""
         try:
             try:
                 exposure_ms = self.camera.ExposureTime.GetValue() / 1000.0
@@ -254,40 +318,64 @@ class FLIRCamera:
             return None
 
     def get_frame_hq(self):
-        """Grab a single HQ_LINEAR frame for saving. Pauses live stream temporarily."""
+        """Grab a single HQ_LINEAR frame for saving.
+
+        Holds _lock and sets _hq_pending for the duration so the live-view
+        worker cannot consume the frame this is waiting for. Without that, the
+        worker thread competes for the stream's two NewestOnly buffers and this
+        grab can time out, which surfaces to the user as "no frame available"
+        even though the live view is clearly working.
+
+        Records the reason in last_error on failure so the caller can report it
+        rather than failing silently.
+        """
         if not self.is_initialized:
+            self.last_error = "camera not initialised"
             return None
 
-        was_acquiring = self.is_acquiring
-        if was_acquiring:
-            self.stop_acquisition()
-
+        self.last_error = None
+        self._hq_pending.set()
         frame = None
         try:
-            self.camera.BeginAcquisition()
-            self.is_acquiring = True
+            with self._lock:
+                was_acquiring = self.is_acquiring
+                if was_acquiring:
+                    self.stop_acquisition()
+                try:
+                    self.camera.BeginAcquisition()
+                    self.is_acquiring = True
 
-            try:
-                exposure_ms = self.camera.ExposureTime.GetValue() / 1000.0
-                timeout_ms = max(200, int(exposure_ms) + 500)
-            except Exception:
-                timeout_ms = 2000
+                    try:
+                        exposure_ms = self.camera.ExposureTime.GetValue() / 1000.0
+                        timeout_ms = max(200, int(exposure_ms) + 500)
+                    except Exception:
+                        timeout_ms = 2000
 
-            image_result = self.camera.GetNextImage(timeout_ms)
-            if not image_result.IsIncomplete():
-                image_converted = image_result.Convert(
-                    PySpin.PixelFormat_BGR8, PySpin.HQ_LINEAR
-                )
-                frame = image_converted.GetNDArray().copy()
-            image_result.Release()
+                    image_result = self.camera.GetNextImage(timeout_ms)
+                    if image_result.IsIncomplete():
+                        self.last_error = (
+                            f"incomplete image (status {image_result.GetImageStatus()})"
+                        )
+                    else:
+                        image_converted = image_result.Convert(
+                            PySpin.PixelFormat_BGR8, PySpin.HQ_LINEAR
+                        )
+                        frame = image_converted.GetNDArray().copy()
+                    image_result.Release()
 
-        except Exception as ex:
-            print(f"Error capturing HQ frame: {ex}")
+                except Exception as ex:
+                    self.last_error = str(ex)
+                    print(f"Error capturing HQ frame: {ex}")
+                finally:
+                    self.stop_acquisition()
+                    if was_acquiring:
+                        try:
+                            self.camera.BeginAcquisition()
+                            self.is_acquiring = True
+                        except Exception as ex:
+                            print(f"Error restarting acquisition after capture: {ex}")
         finally:
-            self.stop_acquisition()
-            if was_acquiring:
-                self.camera.BeginAcquisition()
-                self.is_acquiring = True
+            self._hq_pending.clear()
 
         return frame
 
@@ -314,6 +402,108 @@ class FLIRCamera:
             print("FLIR camera cleanup completed")
         except Exception as ex:
             print(f"Error during cleanup: {ex}")
+
+
+LOGGER = logging.getLogger("rapiid")
+LOG_PATH = None
+
+
+class _StreamToLog:
+    """File-like object that forwards writes to the log file, line by line.
+
+    The installed app is frozen with base="Win32GUI" and has no console, so
+    sys.stdout/sys.stderr are None and every print() and traceback is lost.
+    Pointing them here captures existing diagnostics without having to rewrite
+    each print, including tracebacks from unexpected failures.
+    """
+
+    def __init__(self, level):
+        self._level = level
+        self._buf = ""
+
+    def write(self, text):
+        try:
+            self._buf += text
+            while "\n" in self._buf:
+                line, self._buf = self._buf.split("\n", 1)
+                if line.strip():
+                    LOGGER.log(self._level, line.rstrip())
+        except Exception:
+            pass
+
+    def flush(self):
+        try:
+            if self._buf.strip():
+                LOGGER.log(self._level, self._buf.rstrip())
+            self._buf = ""
+        except Exception:
+            pass
+
+    def isatty(self):
+        return False
+
+
+def setup_logging():
+    """Start writing a rotating log file and return its path.
+
+    The log lives under LOCALAPPDATA rather than beside the executable: the app
+    installs into Program Files, which is not writable by a normal user.
+    Returns None if logging could not be started, which must never be fatal.
+    """
+    global LOG_PATH
+    try:
+        base = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~")
+        log_dir = Path(base) / "RAPIID" / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_path = log_dir / "rapiid.log"
+
+        handler = RotatingFileHandler(
+            log_path, maxBytes=1_000_000, backupCount=3, encoding="utf-8"
+        )
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s  %(levelname)-7s  %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+        ))
+
+        # Configure the root logger so warnings from libraries (qt_material,
+        # for instance) are captured alongside the app's own messages.
+        root = logging.getLogger()
+        root.setLevel(logging.INFO)
+        root.addHandler(handler)
+
+        sys.stdout = _StreamToLog(logging.INFO)
+        sys.stderr = _StreamToLog(logging.ERROR)
+
+        LOG_PATH = log_path
+        return log_path
+    except Exception:
+        return None
+
+
+def log_environment():
+    """Record versions and camera availability — the context most error
+    reports turn out to need."""
+    try:
+        LOGGER.info("=" * 60)
+        LOGGER.info("RAPIID starting")
+        LOGGER.info("python       %s", sys.version.split()[0])
+        LOGGER.info("frozen       %s", bool(getattr(sys, "frozen", False)))
+        LOGGER.info("opencv       %s", cv2.__version__)
+        LOGGER.info("qt_material  %s", "available" if QT_MATERIAL_AVAILABLE else "missing")
+        LOGGER.info("PySpin       %s", "available" if FLIR_AVAILABLE else "missing")
+        LOGGER.info("QR / 1D      %s / %s", QR_AVAILABLE, BARCODE_1D_AVAILABLE)
+        if FLIR_AVAILABLE:
+            try:
+                system = PySpin.System.GetInstance()
+                ver = system.GetLibraryVersion()
+                cams = system.GetCameras()
+                LOGGER.info("Spinnaker    %s.%s.%s.%s, %s camera(s) detected",
+                            ver.major, ver.minor, ver.type, ver.build, cams.GetSize())
+                cams.Clear()
+                system.ReleaseInstance()
+            except Exception as ex:
+                LOGGER.warning("Spinnaker probe failed: %s", ex)
+    except Exception:
+        pass
 
 
 def slugify(text):
@@ -825,10 +1015,28 @@ class LabelCameraSlot(QWidget):
                 font = item.font(); font.setItalic(False); item.setFont(font)
 
     def get_frame_for_capture(self):
-        """Return the best available frame for saving to disk."""
+        """Return (frame, note) — the best frame for saving, plus any caveat.
+
+        FLIR captures prefer a dedicated HQ_LINEAR grab, but fall back to the
+        most recent live-view frame when that fails. The live-view frame is
+        full resolution and differs only in debayering quality, so a visibly
+        working live feed should never produce a failed capture.
+
+        note is None on a clean capture, or a short explanation to show the
+        user when the fallback was used.
+        """
         if self.label_camera_type == 'FLIR' and self.flir_camera and self.flir_camera.is_initialized:
-            return self.flir_camera.get_frame_hq()
-        return self.frame
+            frame = self.flir_camera.get_frame_hq()
+            if frame is not None:
+                return frame, None
+            if self.frame is not None:
+                reason = self.flir_camera.last_error or "unknown error"
+                return self.frame, (
+                    f"high-quality capture failed ({reason}); "
+                    "saved the live-view frame instead"
+                )
+            return None, self.flir_camera.last_error
+        return self.frame, None
 
     def get_device_info(self):
         """Short description of the active camera for EXIF/CSV metadata."""
@@ -1309,6 +1517,11 @@ class UI(QMainWindow):
             self._barcode_frame_signal.connect(self._display_frame)
 
             self.statusBar().showMessage("Ready")
+
+            # Tell the user where the log file is, so it can be found without
+            # having to hunt through LOCALAPPDATA when reporting a problem.
+            if LOG_PATH:
+                self.log_info(f"Log file: {LOG_PATH}")
 
             # Capture button flash timer
             self._capture_flash_timer = QtCore.QTimer(self)
@@ -1916,11 +2129,14 @@ class UI(QMainWindow):
                 self.output_location_folder.joinpath(accession + tag + self.file_format)
             )
 
-            frame_to_save = slot.get_frame_for_capture()
+            frame_to_save, frame_note = slot.get_frame_for_capture()
             if frame_to_save is None:
-                self.log_info(f"{slot.camera_name()}: no frame available!")
+                detail = f" ({frame_note})" if frame_note else ""
+                self.log_info(f"{slot.camera_name()}: no frame available!{detail}")
                 self._flash_capture_feedback(success=False)
                 return
+            if frame_note:
+                self.log_info(f"{slot.camera_name()}: {frame_note}")
 
             cv2.imwrite(file_name, frame_to_save)
             self.log_info(f"{slot.camera_name()}: {os.path.basename(file_name)} saved.")
@@ -1978,6 +2194,9 @@ class UI(QMainWindow):
             print(f"Error updating output location: {e}")
 
     def log_info(self, info):
+        # Mirror to the log file first, so a message still reaches the log even
+        # if the widget update fails.
+        LOGGER.info(info)
         try:
             now = datetime.datetime.now()
             self.ui.listWidget_log.addItem(now.strftime("%H:%M:%S") + " " + info)
@@ -2090,6 +2309,12 @@ class UI(QMainWindow):
 
 if __name__ == "__main__":
     try:
+        # Start the log file before anything else, so startup failures are
+        # recorded too. The installed app has no console, so this is the only
+        # place diagnostics survive.
+        setup_logging()
+        log_environment()
+
         # Set the Windows AppUserModelID before creating QApplication so the
         # taskbar and Start Menu use the app's own icon rather than Python's.
         if sys.platform == "win32":

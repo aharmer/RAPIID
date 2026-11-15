@@ -264,6 +264,32 @@ On Windows, OpenCV uses the DirectShow backend (`CAP_DSHOW`) for all webcam oper
 
 ---
 
+## Troubleshooting
+
+### Log file
+
+RAPIID writes a log of each session to:
+
+```
+%LOCALAPPDATA%\RAPIID\logs\rapiid.log
+```
+
+The path is also shown in the app's own log panel at startup. The file rotates at 1 MB and keeps three previous copies, so it will not grow without limit.
+
+It records the app version, Python/OpenCV/Spinnaker versions, how many FLIR cameras were detected, and everything that appears in the in-app log panel — plus errors that are not shown in the interface. **Attach this file when reporting a problem**; the installed app has no console, so it is the only place these diagnostics survive.
+
+### FLIR camera settings are stored in the camera
+
+FLIR cameras keep their configuration in hardware rather than in RAPIID. A camera used with other software, or on another computer, can come back with trigger mode enabled, a very long exposure, or a throttled frame rate still set — which stops acquisition working in ways that look like an application fault, and which restarting or reinstalling RAPIID will not clear.
+
+RAPIID therefore loads the camera's **Default user set** each time it initialises the camera, so every session starts from a known state. If a camera still misbehaves, open SpinView and confirm the settings there.
+
+### "No frame available" on capture
+
+If the high-quality capture grab fails, RAPIID now falls back to the current live-view frame rather than failing. The image is still full resolution and differs only in debayering quality, and the log panel records that the fallback was used along with the underlying error. A genuine "no frame available" therefore means no frame has arrived from the camera at all — check the live view is actually updating.
+
+---
+
 ## License
 
 Images captured with RAPIID are tagged with a CC-BY 4.0 license. The application code itself is under a GPL-3.0 license.
