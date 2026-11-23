@@ -14,8 +14,8 @@ metadata to CSV and EXIF. Ships to end users as an Inno Setup installer.
 - cx_Freeze builds the frozen exe; Inno Setup 7 builds the installer.
 - **Interpreter:** the `python.exe` of the project's conda env. Paths for
   this machine are in `CLAUDE.local.md` (gitignored) when present.
-  `environment.yml` is a stale, incomplete snapshot (wrong env name, missing
-  pylibdmtx/Pillow/piexif); don't treat it as the source of truth.
+  `environment.yml` lists direct dependencies only, pinned. When adding or
+  upgrading a package, update it there too.
 - **Pinned:** `qt-material==2.12`. Newer versions drop PyQt5 and fail to theme
   without raising an error. Don't upgrade it.
 
