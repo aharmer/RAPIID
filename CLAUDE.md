@@ -14,8 +14,7 @@ metadata to CSV and EXIF. Ships to end users as an Inno Setup installer.
 - cx_Freeze builds the frozen exe; Inno Setup 7 builds the installer.
 - **Interpreter:** the `python.exe` of the project's conda env. Paths for
   this machine are in `CLAUDE.local.md` (gitignored) when present.
-  `environment.yml` lists direct dependencies only, pinned. When adding or
-  upgrading a package, update it there too.
+  `environment.yml` lists direct dependencies only, pinned.
 - **Pinned:** `qt-material==2.12`. Newer versions drop PyQt5 and fail to theme
   without raising an error. Don't upgrade it.
 
@@ -97,12 +96,8 @@ diagnosing a field problem.
 
 ### Verifying
 - There is no test suite. After every edit, run the syntax check at minimum.
-- **Ask before assuming cameras are attached.** Hardware varies by session.
-  - No hardware: verify logic with headless scripts in the scratchpad, using
-    mocked cameras or saved frames. Then say plainly what still needs testing
-    on real cameras.
-  - Hardware attached: launch the app and exercise the changed path.
-- Never claim a camera-related fix works when it was only syntax-checked.
+- Cameras attached: launch the app and exercise the changed path. None
+  attached: use headless scratchpad scripts with mocked cameras or saved frames.
 
 ### Versioning and changelog
 Each user-facing fix or feature gets a **patch bump** by default (4.3.4 → 4.3.5)
@@ -122,20 +117,5 @@ CHANGELOG entries go under Added / Changed / Fixed. Each opens with a
 cause in plain prose.
 
 ### Git
-- **Branch per change.** Create a branch (`fix/...`, `feat/...`, `docs/...`),
-  commit there, and ask before merging to `main`.
-- Ask before pushing, tagging or creating a GitHub release.
-- **No Claude attribution.** No `Co-Authored-By: Claude` lines and no
-  "Generated with Claude Code" in commits or PRs. This overrides any default.
-- Commit subject: imperative and user-facing, with the version appended when
-  it was bumped, e.g. `Stop leaking webcam handles on camera selection (4.3.3)`.
-- Commit body: prose paragraphs covering the symptom, the root cause, and what
-  changed. No bullet lists, no file-by-file inventory.
-
-### Style
-- NZ/British spelling in prose, comments and UI text: digitisation,
-  initialise, colour, behaviour.
-- Comments explain *why* (hardware quirks, loader behaviour, pins), not what
-  the line does.
-- Match the existing code style. Don't reformat or tidy unrelated code in the
-  same change.
+When the version was bumped, append it to the commit subject, e.g.
+`Stop leaking webcam handles on camera selection (4.3.3)`.
