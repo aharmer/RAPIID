@@ -12,7 +12,8 @@ metadata to CSV and EXIF. Ships to end users as an Inno Setup installer.
 - PyQt5 GUI, OpenCV (webcams, QR, 1D barcodes), pylibdmtx (DataMatrix),
   PySpin / Spinnaker SDK (FLIR), Pillow + piexif (EXIF), qt-material (theme).
 - cx_Freeze builds the frozen exe; Inno Setup 7 builds the installer.
-- **Interpreter:** `C:/Users/HarmerA/.conda/envs/rapiid/python.exe`.
+- **Interpreter:** the `python.exe` of the project's conda env. Paths for
+  this machine are in `CLAUDE.local.md` (gitignored) when present.
   `environment.yml` is a stale, incomplete snapshot (wrong env name, missing
   pylibdmtx/Pillow/piexif); don't treat it as the source of truth.
 - **Pinned:** `qt-material==2.12`. Newer versions drop PyQt5 and fail to theme
@@ -52,7 +53,7 @@ $PY rapiid.py
 
 # Build the frozen app, then the installer (only when asked)
 $PY setup.py build
-"C:/Program Files/Inno Setup 7/ISCC.exe" RAPIID.iss
+ISCC RAPIID.iss
 ```
 Building inside Dropbox can fail with `[WinError 110]` because Dropbox locks
 `rapiid.exe`. If it does, build outside Dropbox and pass
